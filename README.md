@@ -155,10 +155,6 @@ The action is automatically built and published when you push to the `main` bran
 To publish a new version:
 
 1. Update the version in `package.json`
-2. Create a new tag:
-   ```bash
-   git tag v1.0.0
-   git push origin v1.0.0
-   ```
+2. Create a new release
 
 The GitHub workflow will automatically build and commit the compiled action to the repository.

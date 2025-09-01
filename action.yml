@@ -13,6 +13,10 @@ inputs:
     description: 'Maximum number of commits to analyze'
     required: false
     default: '10'
+  auto-setup:
+    description: 'Automatically setup GitHub ranking data if not found'
+    required: false
+    default: 'true'
 outputs:
   country:
     description: 'The country where the user is ranked'

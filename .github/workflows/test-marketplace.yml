@@ -1,0 +1,26 @@
+name: 'Test GitHub User Rank Tracker'
+
+on:
+  push:
+    branches: [ test-marketplace ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Track GitHub User Progress
+        uses: maifeeulasad/my-github-rank@v0.0.4
+        id: tracker
+        with:
+          username: 'maifeeulasad'
+          days: '7'
+          max-commits: '10'
+          
+      - name: Display Results
+        run: |
+          echo "Country: ${{ steps.tracker.outputs.country }}"
+          echo "Followers Rank Change: ${{ steps.tracker.outputs.followers-rank-change }}"
+          echo "${{ steps.tracker.outputs.summary }}"

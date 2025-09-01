@@ -1,0 +1,14 @@
+name: 'Hello World'
+description: 'A simple Hello World GitHub Action'
+author: 'maifeeulasad'
+inputs:
+  who-to-greet:
+    description: 'Who to greet'
+    required: true
+    default: 'World'
+outputs:
+  greeting:
+    description: 'The greeting message'
+runs:
+  using: 'node20'
+  main: 'dist/index.js'

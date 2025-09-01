@@ -1,12 +1,17 @@
 import { simpleGit, SimpleGit } from 'simple-git';
-import { readFile, access } from 'fs/promises';
+import { readFile, access, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { constants } from 'fs';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+const execAsync = promisify(exec);
 
 export interface UserProgressRequest {
   username: string;
   days: number;
   maxCommits?: number; // default 10
+  autoSetup?: boolean; // default true
 }
 
 export interface UserRankingSnapshot {
@@ -68,7 +73,30 @@ export class UserProgressTracker {
     try {
       await access(this.markdownPath, constants.F_OK);
     } catch (error) {
-      throw new Error(`GitHub ranking data not found at ${this.markdownPath}. Please run 'npm run setup-data' first.`);
+      // Data not found, try to set it up
+      console.log('📥 GitHub ranking data not found, attempting setup...');
+      try {
+        const dataPath = join(this.repoPath, 'src', 'top-github-users');
+        
+        // Create directory if it doesn't exist
+        await mkdir(join(this.repoPath, 'src'), { recursive: true });
+        
+        // Clone the repository
+        const cloneCommand = `git clone https://github.com/gayanvoice/top-github-users.git "${dataPath}"`;
+        console.log(`🔄 Running: ${cloneCommand}`);
+        
+        await execAsync(cloneCommand, { 
+          cwd: this.repoPath,
+          timeout: 120000 
+        });
+        
+        // Verify setup was successful
+        await access(this.markdownPath, constants.F_OK);
+        console.log('✅ GitHub ranking data setup completed');
+        
+      } catch (setupError) {
+        throw new Error(`GitHub ranking data not found at ${this.markdownPath} and auto-setup failed: ${setupError instanceof Error ? setupError.message : String(setupError)}`);
+      }
     }
 
     // Step 1: Find user's country

@@ -93,7 +93,7 @@ async function run(): Promise<void> {
     const username = core.getInput('username');
     const days = parseInt(core.getInput('days') || '7');
     const maxCommits = parseInt(core.getInput('max-commits') || '10');
-    const autoSetup = core.getInput('auto-setup').toLowerCase() !== 'false';
+    const autoSetup = (core.getInput('auto-setup').toLowerCase() !== 'false') || true;
     
     if (!username) {
       throw new Error('Username is required');
@@ -117,7 +117,8 @@ async function run(): Promise<void> {
     const result = await tracker.trackUserProgress({
       username,
       days,
-      maxCommits
+      maxCommits,
+      autoSetup
     });
 
     // Set outputs for other workflow steps to use

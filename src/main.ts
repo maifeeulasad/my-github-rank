@@ -21,40 +21,6 @@ async function setupDataIfNeeded(repoPath: string): Promise<void> {
   } catch (error) {
     core.info('📥 GitHub ranking data not found, setting up...');
   }
-
-  try {
-    // Ensure src directory exists
-    const srcPath = join(repoPath, 'src');
-    await mkdir(srcPath, { recursive: true });
-    
-    // Clone the top-github-users repository
-    const cloneCommand = `git clone https://github.com/gayanvoice/top-github-users.git "${dataPath}"`;
-    core.info(`🔄 Running: ${cloneCommand}`);
-    
-    const { stdout, stderr } = await execAsync(cloneCommand, { 
-      cwd: repoPath,
-      timeout: 120000 // 2 minutes timeout for large repository
-    });
-    
-    if (stdout) core.info(`Clone output: ${stdout}`);
-    if (stderr && !stderr.includes('Cloning into')) {
-      core.warning(`Clone stderr: ${stderr}`);
-    }
-    
-    // Verify the setup was successful
-    await access(markdownPath, constants.F_OK);
-    core.info('✅ GitHub ranking data setup completed successfully');
-    
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    core.error(`Failed to setup GitHub ranking data: ${errorMessage}`);
-    
-    // Provide helpful guidance
-    core.info('💡 You can also manually run "npm run setup-data" in your repository');
-    core.info('💡 Or set the "auto-setup" input to "false" and handle data setup in your workflow');
-    
-    throw new Error(`Failed to setup GitHub ranking data: ${errorMessage}`);
-  }
 }
 
 // SVG generation function (simplified version for actions)

@@ -53,7 +53,7 @@ export class UserProgressTracker {
 
   constructor(repositoryPath: string = process.cwd()) {
     this.repoPath = repositoryPath;
-    this.markdownPath = join(repositoryPath, 'markdown');
+    this.markdownPath = join(repositoryPath, 'src', 'top-github-users', 'markdown');
     this.git = simpleGit(repositoryPath);
   }
 

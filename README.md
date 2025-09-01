@@ -11,6 +11,7 @@ This action analyzes a user's ranking changes across different metrics (follower
 - 📅 Configurable time range for analysis
 - 📈 Historical snapshots showing ranking progression
 - 🎯 CLI tool for local development and testing
+- 🎨 **SVG report generation** for visual progress reports
 - ⚡ Fast analysis with configurable commit limits
 
 ## Usage
@@ -43,6 +44,12 @@ jobs:
           echo "Country: ${{ steps.tracker.outputs.country }}"
           echo "Followers Rank Change: ${{ steps.tracker.outputs.followers-rank-change }}"
           echo "${{ steps.tracker.outputs.summary }}"
+          
+      - name: Upload SVG Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: rank-progress-report
+          path: ${{ steps.tracker.outputs.svg-path }}
 ```
 
 ### As a CLI Tool
@@ -78,6 +85,7 @@ npm run track --help
 | `total-contributions-rank-change` | Change in total contributions ranking |
 | `commits-analyzed` | Number of commits that were analyzed |
 | `summary` | Formatted markdown summary of the progress report |
+| `svg-path` | Path to the generated SVG report file |
 
 ## How It Works
 
@@ -89,6 +97,7 @@ npm run track --help
 
 ## Example Output
 
+### Console Output
 ```
 📊 PROGRESS REPORT FOR @MAIFEEULASAD
 🌍 Country: BANGLADESH
@@ -106,6 +115,17 @@ npm run track --help
    Rank: #18 → #15 ⬆️ (improved by 3)
    Count: +67 contributions
 ```
+
+### SVG Report
+The tool automatically generates a beautiful SVG report showing:
+- 📊 Visual ranking progress indicators
+- 📈 Timeline chart (when multiple commits are analyzed)
+- 🎨 Professional dark theme design
+- 📱 Shareable format perfect for GitHub README files
+
+SVG files are saved to:
+- **CLI**: `output/<username>-rank-progress.svg`
+- **GitHub Action**: `<username>-rank-progress.svg` (in repository root)
 
 ## Development
 

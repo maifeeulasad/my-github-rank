@@ -30,8 +30,8 @@ jobs:
         id: tracker
         with:
           username: 'maifeeulasad'
-          days: '7'
-          max-commits: '5'
+          days: '100'
+          max-commits: '10000'
           
       - name: Display test results
         run: |

@@ -18,8 +18,8 @@ jobs:
         id: tracker
         with:
           username: ${{ github.repository_owner }}
-          days: '7'
-          max-commits: '100'
+          days: '100'
+          max-commits: '10000'
           
       - name: Display Results
         run: |

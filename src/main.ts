@@ -2,26 +2,6 @@ import * as core from '@actions/core';
 import { UserProgressTracker } from './user-progress-tracker.js';
 import { writeFile, mkdir, access } from 'fs/promises';
 import { join } from 'path';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import { constants } from 'fs';
-
-const execAsync = promisify(exec);
-
-// Function to setup GitHub ranking data if it doesn't exist
-async function setupDataIfNeeded(repoPath: string): Promise<void> {
-  const dataPath = join(repoPath, 'src', 'top-github-users');
-  const markdownPath = join(dataPath, 'markdown');
-  
-  try {
-    // Check if the markdown directory exists
-    await access(markdownPath, constants.F_OK);
-    core.info('✅ GitHub ranking data already exists');
-    return;
-  } catch (error) {
-    core.info('📥 GitHub ranking data not found, setting up...');
-  }
-}
 
 // SVG generation function (simplified version for actions)
 function generateProgressSVG(result: any): string {
@@ -105,11 +85,6 @@ async function run(): Promise<void> {
 
     // Initialize workspace path
     const repoPath = process.env.GITHUB_WORKSPACE || process.cwd();
-    
-    // Setup GitHub ranking data if needed and auto-setup is enabled
-    if (autoSetup) {
-      await setupDataIfNeeded(repoPath);
-    }
     
     // Initialize tracker with the current workspace
     const tracker = new UserProgressTracker(repoPath);

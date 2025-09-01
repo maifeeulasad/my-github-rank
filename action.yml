@@ -1,14 +1,31 @@
-name: 'Hello World'
-description: 'A simple Hello World GitHub Action'
+name: 'GitHub User Rank Tracker'
+description: 'Track GitHub user ranking progress over time by analyzing git commit history'
 author: 'maifeeulasad'
 inputs:
-  who-to-greet:
-    description: 'Who to greet'
+  username:
+    description: 'GitHub username to track'
     required: true
-    default: 'World'
+  days:
+    description: 'Number of days to look back'
+    required: false
+    default: '7'
+  max-commits:
+    description: 'Maximum number of commits to analyze'
+    required: false
+    default: '10'
 outputs:
-  greeting:
-    description: 'The greeting message'
+  country:
+    description: 'The country where the user is ranked'
+  followers-rank-change:
+    description: 'Change in followers ranking (positive = improvement)'
+  public-contributions-rank-change:
+    description: 'Change in public contributions ranking (positive = improvement)'
+  total-contributions-rank-change:
+    description: 'Change in total contributions ranking (positive = improvement)'
+  commits-analyzed:
+    description: 'Number of commits analyzed'
+  summary:
+    description: 'Formatted summary of the progress report'
 runs:
   using: 'node20'
   main: 'dist/index.js'

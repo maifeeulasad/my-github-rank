@@ -33403,11 +33403,16 @@ const promises_namespaceObject = __WEBPACK_EXTERNAL_createRequire(import.meta.ur
 var external_path_ = __nccwpck_require__(6928);
 // EXTERNAL MODULE: external "fs"
 var external_fs_ = __nccwpck_require__(9896);
+// EXTERNAL MODULE: external "util"
+var external_util_ = __nccwpck_require__(9023);
 ;// CONCATENATED MODULE: ./src/user-progress-tracker.ts
 
 
 
 
+
+
+const execAsync = (0,external_util_.promisify)(external_child_process_.exec);
 class UserProgressTracker {
     constructor(repositoryPath = process.cwd()) {
         this.repoPath = repositoryPath;
@@ -33424,7 +33429,26 @@ class UserProgressTracker {
             await (0,promises_namespaceObject.access)(this.markdownPath, external_fs_.constants.F_OK);
         }
         catch (error) {
-            throw new Error(`GitHub ranking data not found at ${this.markdownPath}. Please run 'npm run setup-data' first.`);
+            // Data not found, try to set it up
+            console.log('📥 GitHub ranking data not found, attempting setup...');
+            try {
+                const dataPath = (0,external_path_.join)(this.repoPath, 'src', 'top-github-users');
+                // Create directory if it doesn't exist
+                await (0,promises_namespaceObject.mkdir)((0,external_path_.join)(this.repoPath, 'src'), { recursive: true });
+                // Clone the repository
+                const cloneCommand = `git clone https://github.com/gayanvoice/top-github-users.git "${dataPath}"`;
+                console.log(`🔄 Running: ${cloneCommand}`);
+                await execAsync(cloneCommand, {
+                    cwd: this.repoPath,
+                    timeout: 120000
+                });
+                // Verify setup was successful
+                await (0,promises_namespaceObject.access)(this.markdownPath, external_fs_.constants.F_OK);
+                console.log('✅ GitHub ranking data setup completed');
+            }
+            catch (setupError) {
+                throw new Error(`GitHub ranking data not found at ${this.markdownPath} and auto-setup failed: ${setupError instanceof Error ? setupError.message : String(setupError)}`);
+            }
         }
         // Step 1: Find user's country
         const country = await this.findUserCountry(request.username);
@@ -33660,8 +33684,6 @@ class UserProgressTracker {
     }
 }
 
-// EXTERNAL MODULE: external "util"
-var external_util_ = __nccwpck_require__(9023);
 ;// CONCATENATED MODULE: ./src/main.ts
 
 
@@ -33670,7 +33692,7 @@ var external_util_ = __nccwpck_require__(9023);
 
 
 
-const execAsync = (0,external_util_.promisify)(external_child_process_.exec);
+const main_execAsync = (0,external_util_.promisify)(external_child_process_.exec);
 // Function to setup GitHub ranking data if it doesn't exist
 async function setupDataIfNeeded(repoPath) {
     const dataPath = (0,external_path_.join)(repoPath, 'src', 'top-github-users');
@@ -33683,34 +33705,6 @@ async function setupDataIfNeeded(repoPath) {
     }
     catch (error) {
         core.info('📥 GitHub ranking data not found, setting up...');
-    }
-    try {
-        // Ensure src directory exists
-        const srcPath = (0,external_path_.join)(repoPath, 'src');
-        await (0,promises_namespaceObject.mkdir)(srcPath, { recursive: true });
-        // Clone the top-github-users repository
-        const cloneCommand = `git clone https://github.com/gayanvoice/top-github-users.git "${dataPath}"`;
-        core.info(`🔄 Running: ${cloneCommand}`);
-        const { stdout, stderr } = await execAsync(cloneCommand, {
-            cwd: repoPath,
-            timeout: 120000 // 2 minutes timeout for large repository
-        });
-        if (stdout)
-            core.info(`Clone output: ${stdout}`);
-        if (stderr && !stderr.includes('Cloning into')) {
-            core.warning(`Clone stderr: ${stderr}`);
-        }
-        // Verify the setup was successful
-        await (0,promises_namespaceObject.access)(markdownPath, external_fs_.constants.F_OK);
-        core.info('✅ GitHub ranking data setup completed successfully');
-    }
-    catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        core.error(`Failed to setup GitHub ranking data: ${errorMessage}`);
-        // Provide helpful guidance
-        core.info('💡 You can also manually run "npm run setup-data" in your repository');
-        core.info('💡 Or set the "auto-setup" input to "false" and handle data setup in your workflow');
-        throw new Error(`Failed to setup GitHub ranking data: ${errorMessage}`);
     }
 }
 // SVG generation function (simplified version for actions)
@@ -33781,7 +33775,7 @@ async function run() {
         const username = core.getInput('username');
         const days = parseInt(core.getInput('days') || '7');
         const maxCommits = parseInt(core.getInput('max-commits') || '10');
-        const autoSetup = core.getInput('auto-setup').toLowerCase() !== 'false';
+        const autoSetup = (core.getInput('auto-setup').toLowerCase() !== 'false') || true;
         if (!username) {
             throw new Error('Username is required');
         }
@@ -33799,7 +33793,8 @@ async function run() {
         const result = await tracker.trackUserProgress({
             username,
             days,
-            maxCommits
+            maxCommits,
+            autoSetup
         });
         // Set outputs for other workflow steps to use
         core.setOutput('country', result.country);

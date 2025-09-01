@@ -1,7 +1,61 @@
 import * as core from '@actions/core';
 import { UserProgressTracker } from './user-progress-tracker.js';
-import { writeFile, mkdir } from 'fs/promises';
+import { writeFile, mkdir, access } from 'fs/promises';
 import { join } from 'path';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import { constants } from 'fs';
+
+const execAsync = promisify(exec);
+
+// Function to setup GitHub ranking data if it doesn't exist
+async function setupDataIfNeeded(repoPath: string): Promise<void> {
+  const dataPath = join(repoPath, 'src', 'top-github-users');
+  const markdownPath = join(dataPath, 'markdown');
+  
+  try {
+    // Check if the markdown directory exists
+    await access(markdownPath, constants.F_OK);
+    core.info('✅ GitHub ranking data already exists');
+    return;
+  } catch (error) {
+    core.info('📥 GitHub ranking data not found, setting up...');
+  }
+
+  try {
+    // Ensure src directory exists
+    const srcPath = join(repoPath, 'src');
+    await mkdir(srcPath, { recursive: true });
+    
+    // Clone the top-github-users repository
+    const cloneCommand = `git clone https://github.com/gayanvoice/top-github-users.git "${dataPath}"`;
+    core.info(`🔄 Running: ${cloneCommand}`);
+    
+    const { stdout, stderr } = await execAsync(cloneCommand, { 
+      cwd: repoPath,
+      timeout: 120000 // 2 minutes timeout for large repository
+    });
+    
+    if (stdout) core.info(`Clone output: ${stdout}`);
+    if (stderr && !stderr.includes('Cloning into')) {
+      core.warning(`Clone stderr: ${stderr}`);
+    }
+    
+    // Verify the setup was successful
+    await access(markdownPath, constants.F_OK);
+    core.info('✅ GitHub ranking data setup completed successfully');
+    
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    core.error(`Failed to setup GitHub ranking data: ${errorMessage}`);
+    
+    // Provide helpful guidance
+    core.info('💡 You can also manually run "npm run setup-data" in your repository');
+    core.info('💡 Or set the "auto-setup" input to "false" and handle data setup in your workflow');
+    
+    throw new Error(`Failed to setup GitHub ranking data: ${errorMessage}`);
+  }
+}
 
 // SVG generation function (simplified version for actions)
 function generateProgressSVG(result: any): string {
@@ -73,6 +127,7 @@ async function run(): Promise<void> {
     const username = core.getInput('username');
     const days = parseInt(core.getInput('days') || '7');
     const maxCommits = parseInt(core.getInput('max-commits') || '10');
+    const autoSetup = core.getInput('auto-setup').toLowerCase() !== 'false';
     
     if (!username) {
       throw new Error('Username is required');
@@ -82,8 +137,15 @@ async function run(): Promise<void> {
     core.info(`📅 Time range: ${days} days`);
     core.info(`📊 Max commits: ${maxCommits}`);
 
-    // Initialize tracker with the current workspace
+    // Initialize workspace path
     const repoPath = process.env.GITHUB_WORKSPACE || process.cwd();
+    
+    // Setup GitHub ranking data if needed and auto-setup is enabled
+    if (autoSetup) {
+      await setupDataIfNeeded(repoPath);
+    }
+    
+    // Initialize tracker with the current workspace
     const tracker = new UserProgressTracker(repoPath);
     
     const result = await tracker.trackUserProgress({
@@ -117,7 +179,12 @@ async function run(): Promise<void> {
     // Generate SVG file
     try {
       const svgContent = generateProgressSVG(result);
-      const outputPath = join(repoPath, `${username}-rank-progress.svg`);
+      
+      // Ensure output directory exists
+      const outputDir = join(repoPath, 'output');
+      await mkdir(outputDir, { recursive: true });
+      
+      const outputPath = join(outputDir, `${username}-rank-progress.svg`);
       await writeFile(outputPath, svgContent, 'utf-8');
       core.setOutput('svg-path', outputPath);
       core.info(`📊 SVG report generated: ${outputPath}`);

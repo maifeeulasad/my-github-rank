@@ -9,7 +9,9 @@
     "package": "ncc build src/main.ts -o dist --source-map --license licenses.txt",
     "test": "jest",
     "all": "npm run build && npm run package",
-    "track": "node --loader ts-node/esm src/user-tracker-cli.ts"
+    "track": "node --loader ts-node/esm src/user-tracker-cli.ts",
+    "gitclone": "git clone https://github.com/gayanvoice/top-github-users.git src/top-github-users",
+    "postinstall": "npm run gitclone"
   },
   "repository": {
     "type": "git",

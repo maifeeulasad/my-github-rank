@@ -56,14 +56,12 @@ export class UserProgressTracker {
   private repoPath: string;
   private topGithubUsersPath: string;
   private markdownPath: string;
-  private git: SimpleGit;
   private topGithubUsersGit: SimpleGit;
 
   constructor(repositoryPath: string = process.cwd()) {
     this.repoPath = repositoryPath;
     this.topGithubUsersPath = join(repositoryPath, 'src', 'top-github-users');
     this.markdownPath = join(this.topGithubUsersPath, 'markdown');
-    this.git = simpleGit(repositoryPath);
     this.topGithubUsersGit = simpleGit(this.topGithubUsersPath);
   }
 

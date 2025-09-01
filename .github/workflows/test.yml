@@ -1,4 +1,4 @@
-name: 'Test Hello World Action'
+name: 'Test GitHub User Rank Tracker'
 
 on:
   push:
@@ -25,7 +25,17 @@ jobs:
       - name: Build and package
         run: npm run all
 
-      - name: Test Hello World Action
+      - name: Test GitHub User Rank Tracker
         uses: ./
+        id: tracker
         with:
-          who-to-greet: 'GitHub Actions'
+          username: 'maifeeulasad'
+          days: '7'
+          max-commits: '5'
+          
+      - name: Display test results
+        run: |
+          echo "Test completed successfully!"
+          echo "Country: ${{ steps.tracker.outputs.country }}"
+          echo "Followers rank change: ${{ steps.tracker.outputs.followers-rank-change }}"
+          echo "Commits analyzed: ${{ steps.tracker.outputs.commits-analyzed }}"

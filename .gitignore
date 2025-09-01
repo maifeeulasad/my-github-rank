@@ -86,7 +86,7 @@ out
 
 # Nuxt.js build / generate output
 .nuxt
-dist
+# dist
 
 # Gatsby files
 .cache/
@@ -145,4 +145,5 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 # generated files
-lib/
+# lib/ - commented out because GitHub Actions might need compiled files
+# lib/

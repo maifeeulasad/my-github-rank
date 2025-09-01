@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { UserProgressTrackerV2 } from './user-progress-tracker';
+import { UserProgressTrackerV2 } from './user-progress-tracker.js';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 

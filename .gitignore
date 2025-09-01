@@ -9,6 +9,9 @@ lerna-debug.log*
 # Downloaded GitHub ranking data
 src/top-github-users/
 
+# Generated output files
+output/
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 

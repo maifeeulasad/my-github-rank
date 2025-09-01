@@ -12,12 +12,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Track GitHub User Progress
-        uses: maifeeulasad/my-github-rank@v0.0.6
+        uses: maifeeulasad/my-github-rank@v0.0.7
         id: tracker
         with:
           username: 'maifeeulasad'
           days: '7'
-          max-commits: '10'
+          max-commits: '100'
           
       - name: Display Results
         run: |

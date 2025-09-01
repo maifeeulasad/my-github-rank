@@ -74,6 +74,7 @@ npm run track --help
 | `username` | GitHub username to track | Yes | - |
 | `days` | Number of days to look back | No | `7` |
 | `max-commits` | Maximum number of commits to analyze | No | `10` |
+| `auto-setup` | Automatically setup GitHub ranking data if not found | No | `true` |
 
 ## Outputs
 
@@ -148,6 +149,34 @@ SVG files are saved to:
    ```bash
    npm run track <username>
    ```
+
+## Auto-Setup Feature
+
+🆕 **New in this version**: The action now automatically sets up the required GitHub ranking data!
+
+### How it works:
+- When `auto-setup` is `true` (default), the action automatically clones the required ranking data repository
+- If the data already exists, it skips the setup step
+- The setup process takes about 30-60 seconds and only runs once per action execution
+
+### Manual Setup (Optional):
+If you prefer to handle data setup manually or want to disable auto-setup:
+
+```yaml
+- name: Setup GitHub ranking data
+  run: npm run setup-data
+
+- name: Track GitHub User Progress
+  uses: maifeeulasad/my-github-rank@v1
+  with:
+    username: 'your-username'
+    auto-setup: 'false'  # Disable auto-setup, it will fail, unless you are using cache or some other method to ensure data is present
+```
+
+### Troubleshooting:
+- If you encounter setup issues, the action will provide helpful error messages
+- You can always run `npm run setup-data` manually in your repository
+- Set `auto-setup: false` if you want to handle data setup in your workflow
 
 ## Requirements
 

@@ -69,6 +69,9 @@ export class UserProgressTracker {
     try {
       await access(this.markdownPath, constants.F_OK);
       console.log('✅ Found existing GitHub ranking data');
+      
+      // Initialize git instance for existing directory
+      this.topGithubUsersGit = simpleGit(this.topGithubUsersPath);
     } catch (error) {
       // Data not found, try to set it up
       console.log('📥 GitHub ranking data not found, attempting setup...');
@@ -89,13 +92,13 @@ export class UserProgressTracker {
         await access(this.markdownPath, constants.F_OK);
         console.log('✅ GitHub ranking data setup completed');
         
+        // Initialize git instance after successful clone
+        this.topGithubUsersGit = simpleGit(this.topGithubUsersPath);
+        
       } catch (setupError) {
         throw new Error(`GitHub ranking data not found at ${this.markdownPath} and auto-setup failed: ${setupError instanceof Error ? setupError.message : String(setupError)}`);
       }
     }
-
-    // Initialize git instance after ensuring directory exists
-    this.topGithubUsersGit = simpleGit(this.topGithubUsersPath);
   }
 
   /**

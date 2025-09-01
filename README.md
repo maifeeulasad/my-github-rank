@@ -131,9 +131,13 @@ npm run track --help
 
 ## Requirements
 
-- The repository must contain markdown ranking files in the `markdown/` directory
+- The action automatically downloads GitHub ranking data from [top-github-users](https://github.com/gayanvoice/top-github-users)
 - Git history must be available for the specified time range
 - The target user must exist in the ranking data
+
+## Data Source
+
+This action uses ranking data from the [top-github-users](https://github.com/gayanvoice/top-github-users) repository, which provides comprehensive GitHub user rankings by country across different metrics.
 
 ## License
 

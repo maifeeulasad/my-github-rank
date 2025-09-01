@@ -1,13 +1,15 @@
 {
   "name": "my-github-rank",
   "version": "0.0.0",
+  "type": "module",
   "description": "A simple GitHub Action to get GitHub rank of a user",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "package": "ncc build src/main.ts -o dist --source-map --license licenses.txt",
     "test": "jest",
-    "all": "npm run build && npm run package"
+    "all": "npm run build && npm run package",
+    "track": "node --loader ts-node/esm src/user-tracker-cli.ts"
   },
   "repository": {
     "type": "git",
@@ -28,6 +30,7 @@
   "devDependencies": {
     "@types/node": "^20.10.0",
     "@vercel/ncc": "^0.38.1",
-    "typescript": "^5.3.0"
+    "typescript": "^5.3.0",
+    "ts-node": "^10.9.2"
   }
 }

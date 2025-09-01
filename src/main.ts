@@ -1,5 +1,5 @@
 import * as core from '@actions/core';
-import { UserProgressTrackerV2 } from './user-progress-tracker.js';
+import { UserProgressTracker } from './user-progress-tracker.js';
 
 async function run(): Promise<void> {
   try {
@@ -17,7 +17,7 @@ async function run(): Promise<void> {
 
     // Initialize tracker with the current workspace
     const repoPath = process.env.GITHUB_WORKSPACE || process.cwd();
-    const tracker = new UserProgressTrackerV2(repoPath);
+    const tracker = new UserProgressTracker(repoPath);
     
     const result = await tracker.trackUserProgress({
       username,

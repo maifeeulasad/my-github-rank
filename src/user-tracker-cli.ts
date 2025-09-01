@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { UserProgressTrackerV2 } from './user-progress-tracker.js';
+import { UserProgressTracker } from './user-progress-tracker.js';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -13,7 +13,7 @@ async function main() {
 
   if (args.length === 0 || args.includes('--help') || args.includes('-h')) {
     console.log(`
-🚀 GitHub User Progress Tracker V2
+🚀 GitHub User Progress Tracker 
 
 Usage:
   npm run track <username> [days] [maxCommits]
@@ -55,7 +55,7 @@ The tool will:
   console.log('');
 
   try {
-    const tracker = new UserProgressTrackerV2(repoPath);
+    const tracker = new UserProgressTracker(repoPath);
     const result = await tracker.trackUserProgress({
       username,
       days,

@@ -46,7 +46,7 @@ export interface UserProgressSummary {
   snapshots: UserRankingSnapshot[];
 }
 
-export class UserProgressTrackerV2 {
+export class UserProgressTracker {
   private repoPath: string;
   private markdownPath: string;
   private git: SimpleGit;

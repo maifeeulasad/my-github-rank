@@ -2,10 +2,12 @@ name: 'Test GitHub User Rank Tracker'
 
 on:
   push:
-    branches: [ test-marketplace ]
+    branches: [ main ]
 
 jobs:
   test:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -15,7 +17,7 @@ jobs:
         uses: maifeeulasad/my-github-rank@v0.0.7
         id: tracker
         with:
-          username: 'maifeeulasad'
+          username: ${{ github.repository_owner }}
           days: '7'
           max-commits: '100'
           
@@ -24,3 +26,21 @@ jobs:
           echo "Country: ${{ steps.tracker.outputs.country }}"
           echo "Followers Rank Change: ${{ steps.tracker.outputs.followers-rank-change }}"
           echo "${{ steps.tracker.outputs.summary }}"
+          
+      - name: Move generated SVG
+        run: |
+          mkdir -p output
+          if [ -f "${{ steps.tracker.outputs.svg-path }}" ]; then
+            cp "${{ steps.tracker.outputs.svg-path }}" output/${{ github.repository_owner }}-rank-progress.svg
+          fi
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit and push SVG
+        run: |
+          git add output/${{ github.repository_owner }}-rank-progress.svg
+          git commit -m "[bot]: update GitHub rank progress SVG" || echo "No changes to commit"
+          git push

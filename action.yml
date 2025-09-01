@@ -26,6 +26,8 @@ outputs:
     description: 'Number of commits analyzed'
   summary:
     description: 'Formatted summary of the progress report'
+  svg-path:
+    description: 'Path to the generated SVG report file'
 runs:
   using: 'node20'
   main: 'dist/index.js'

@@ -1,6 +1,7 @@
 import { simpleGit, SimpleGit } from 'simple-git';
-import { readFile } from 'fs/promises';
+import { readFile, access } from 'fs/promises';
 import { join } from 'path';
+import { constants } from 'fs';
 
 export interface UserProgressRequest {
   username: string;
@@ -62,6 +63,13 @@ export class UserProgressTracker {
    */
   async trackUserProgress(request: UserProgressRequest): Promise<UserProgressSummary> {
     console.log(`🔍 Tracking progress for @${request.username} over ${request.days} days...`);
+
+    // Check if the data directory exists
+    try {
+      await access(this.markdownPath, constants.F_OK);
+    } catch (error) {
+      throw new Error(`GitHub ranking data not found at ${this.markdownPath}. Please run 'npm run setup-data' first.`);
+    }
 
     // Step 1: Find user's country
     const country = await this.findUserCountry(request.username);

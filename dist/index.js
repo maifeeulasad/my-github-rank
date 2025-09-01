@@ -33424,6 +33424,8 @@ class UserProgressTracker {
         try {
             await (0,promises_namespaceObject.access)(this.markdownPath, external_fs_.constants.F_OK);
             console.log('✅ Found existing GitHub ranking data');
+            // Initialize git instance for existing directory
+            this.topGithubUsersGit = simpleGit(this.topGithubUsersPath);
         }
         catch (error) {
             // Data not found, try to set it up
@@ -33441,13 +33443,13 @@ class UserProgressTracker {
                 // Verify setup was successful
                 await (0,promises_namespaceObject.access)(this.markdownPath, external_fs_.constants.F_OK);
                 console.log('✅ GitHub ranking data setup completed');
+                // Initialize git instance after successful clone
+                this.topGithubUsersGit = simpleGit(this.topGithubUsersPath);
             }
             catch (setupError) {
                 throw new Error(`GitHub ranking data not found at ${this.markdownPath} and auto-setup failed: ${setupError instanceof Error ? setupError.message : String(setupError)}`);
             }
         }
-        // Initialize git instance after ensuring directory exists
-        this.topGithubUsersGit = simpleGit(this.topGithubUsersPath);
     }
     /**
      * Main method to track user progress across commits

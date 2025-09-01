@@ -1,22 +1,32 @@
-name: 'Example: Hello World'
+name: 'Example: GitHub User Rank Tracker'
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  hello:
+  track-user:
     runs-on: ubuntu-latest
-    name: Say Hello
+    name: Track GitHub User Ranking
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         
-      - name: Hello World Action
+      - name: GitHub User Rank Tracker
         uses: maifeeulasad/my-github-rank@v1
-        id: hello
+        id: tracker
         with:
-          who-to-greet: 'GitHub Actions User'
+          username: 'maifeeulasad'
+          days: '7'
+          max-commits: '10'
           
-      - name: Get the output
-        run: echo "The greeting was ${{ steps.hello.outputs.greeting }}"
+      - name: Display Results
+        run: |
+          echo "Country: ${{ steps.tracker.outputs.country }}"
+          echo "Followers Rank Change: ${{ steps.tracker.outputs.followers-rank-change }}"
+          echo "Public Contributions Rank Change: ${{ steps.tracker.outputs.public-contributions-rank-change }}"
+          echo "Total Contributions Rank Change: ${{ steps.tracker.outputs.total-contributions-rank-change }}"
+          echo "Commits Analyzed: ${{ steps.tracker.outputs.commits-analyzed }}"
+          echo ""
+          echo "Summary:"
+          echo "${{ steps.tracker.outputs.summary }}"

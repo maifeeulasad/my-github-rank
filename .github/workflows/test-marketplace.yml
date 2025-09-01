@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Track GitHub User Progress
-        uses: maifeeulasad/my-github-rank@v0.0.5
+        uses: maifeeulasad/my-github-rank@v0.0.6
         id: tracker
         with:
           username: 'maifeeulasad'

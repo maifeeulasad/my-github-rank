@@ -4,6 +4,9 @@
 
 This action analyzes a user's ranking changes across different metrics (followers, public contributions, total contributions) by examining historical data from git commits, providing insights into how a user's GitHub presence has evolved.
 
+
+<div style="text-align: center;"><img alt="GitHub Ranking" src="output/maifeeulasad-rank-progress.svg" style="width: 100%;" /></div>
+
 ## Features
 
 - 📊 Track ranking changes across followers, public contributions, and total contributions

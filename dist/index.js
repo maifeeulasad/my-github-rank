@@ -33660,11 +33660,59 @@ class UserProgressTracker {
     }
 }
 
+// EXTERNAL MODULE: external "util"
+var external_util_ = __nccwpck_require__(9023);
 ;// CONCATENATED MODULE: ./src/main.ts
 
 
 
 
+
+
+
+const execAsync = (0,external_util_.promisify)(external_child_process_.exec);
+// Function to setup GitHub ranking data if it doesn't exist
+async function setupDataIfNeeded(repoPath) {
+    const dataPath = (0,external_path_.join)(repoPath, 'src', 'top-github-users');
+    const markdownPath = (0,external_path_.join)(dataPath, 'markdown');
+    try {
+        // Check if the markdown directory exists
+        await (0,promises_namespaceObject.access)(markdownPath, external_fs_.constants.F_OK);
+        core.info('✅ GitHub ranking data already exists');
+        return;
+    }
+    catch (error) {
+        core.info('📥 GitHub ranking data not found, setting up...');
+    }
+    try {
+        // Ensure src directory exists
+        const srcPath = (0,external_path_.join)(repoPath, 'src');
+        await (0,promises_namespaceObject.mkdir)(srcPath, { recursive: true });
+        // Clone the top-github-users repository
+        const cloneCommand = `git clone https://github.com/gayanvoice/top-github-users.git "${dataPath}"`;
+        core.info(`🔄 Running: ${cloneCommand}`);
+        const { stdout, stderr } = await execAsync(cloneCommand, {
+            cwd: repoPath,
+            timeout: 120000 // 2 minutes timeout for large repository
+        });
+        if (stdout)
+            core.info(`Clone output: ${stdout}`);
+        if (stderr && !stderr.includes('Cloning into')) {
+            core.warning(`Clone stderr: ${stderr}`);
+        }
+        // Verify the setup was successful
+        await (0,promises_namespaceObject.access)(markdownPath, external_fs_.constants.F_OK);
+        core.info('✅ GitHub ranking data setup completed successfully');
+    }
+    catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        core.error(`Failed to setup GitHub ranking data: ${errorMessage}`);
+        // Provide helpful guidance
+        core.info('💡 You can also manually run "npm run setup-data" in your repository');
+        core.info('💡 Or set the "auto-setup" input to "false" and handle data setup in your workflow');
+        throw new Error(`Failed to setup GitHub ranking data: ${errorMessage}`);
+    }
+}
 // SVG generation function (simplified version for actions)
 function generateProgressSVG(result) {
     const width = 800;
@@ -33733,14 +33781,20 @@ async function run() {
         const username = core.getInput('username');
         const days = parseInt(core.getInput('days') || '7');
         const maxCommits = parseInt(core.getInput('max-commits') || '10');
+        const autoSetup = core.getInput('auto-setup').toLowerCase() !== 'false';
         if (!username) {
             throw new Error('Username is required');
         }
         core.info(`🎯 Tracking progress for @${username}`);
         core.info(`📅 Time range: ${days} days`);
         core.info(`📊 Max commits: ${maxCommits}`);
-        // Initialize tracker with the current workspace
+        // Initialize workspace path
         const repoPath = process.env.GITHUB_WORKSPACE || process.cwd();
+        // Setup GitHub ranking data if needed and auto-setup is enabled
+        if (autoSetup) {
+            await setupDataIfNeeded(repoPath);
+        }
+        // Initialize tracker with the current workspace
         const tracker = new UserProgressTracker(repoPath);
         const result = await tracker.trackUserProgress({
             username,
@@ -33769,7 +33823,10 @@ async function run() {
         // Generate SVG file
         try {
             const svgContent = generateProgressSVG(result);
-            const outputPath = (0,external_path_.join)(repoPath, `${username}-rank-progress.svg`);
+            // Ensure output directory exists
+            const outputDir = (0,external_path_.join)(repoPath, 'output');
+            await (0,promises_namespaceObject.mkdir)(outputDir, { recursive: true });
+            const outputPath = (0,external_path_.join)(outputDir, `${username}-rank-progress.svg`);
             await (0,promises_namespaceObject.writeFile)(outputPath, svgContent, 'utf-8');
             core.setOutput('svg-path', outputPath);
             core.info(`📊 SVG report generated: ${outputPath}`);

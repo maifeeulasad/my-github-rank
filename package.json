@@ -10,8 +10,9 @@
     "test": "jest",
     "all": "npm run build && npm run package",
     "track": "node --loader ts-node/esm src/user-tracker-cli.ts",
-    "gitclone": "git clone https://github.com/gayanvoice/top-github-users.git src/top-github-users",
-    "postinstall": "npm run gitclone"
+    "setup-data": "[ ! -d 'src/top-github-users' ] && git clone https://github.com/gayanvoice/top-github-users.git src/top-github-users || echo 'Data already exists'",
+    "update-data": "cd src/top-github-users && git pull origin main",
+    "postinstall": "npm run setup-data"
   },
   "repository": {
     "type": "git",

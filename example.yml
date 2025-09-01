@@ -1,0 +1,22 @@
+name: 'Example: Hello World'
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+    name: Say Hello
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Hello World Action
+        uses: maifeeulasad/my-github-rank@v1
+        id: hello
+        with:
+          who-to-greet: 'GitHub Actions User'
+          
+      - name: Get the output
+        run: echo "The greeting was ${{ steps.hello.outputs.greeting }}"

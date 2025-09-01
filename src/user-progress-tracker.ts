@@ -82,8 +82,8 @@ export class UserProgressTracker {
         // Create parent directory if it doesn't exist
         await mkdir(join(this.repoPath, 'src'), { recursive: true });
         
-        // Clone the repository
-        const cloneCommand = `git clone https://github.com/gayanvoice/top-github-users.git "${this.topGithubUsersPath}"`;
+        // Clone the repository with full history
+        const cloneCommand = `git clone --no-single-branch https://github.com/gayanvoice/top-github-users.git "${this.topGithubUsersPath}"`;
         console.log(`🔄 Running: ${cloneCommand}`);
         
         await execAsync(cloneCommand, { 
@@ -104,6 +104,22 @@ export class UserProgressTracker {
     try {
       await this.topGithubUsersGit.checkIsRepo();
       console.log('✅ Confirmed top-github-users is a valid git repository');
+      
+      // If this is a fresh clone, ensure we have complete git history
+      try {
+        const status = await this.topGithubUsersGit.status();
+        const log = await this.topGithubUsersGit.log({ maxCount: 10 });
+        
+        if (log.all.length < 10) {
+          console.log('🔄 Fetching complete git history...');
+          await this.topGithubUsersGit.fetch(['--unshallow']).catch(() => {
+            // Ignore error if already unshallow
+            console.log('📥 Repository already has full history or fetch --unshallow not needed');
+          });
+        }
+      } catch (historyError) {
+        console.warn('⚠️  Could not verify/fetch git history:', historyError);
+      }
     } catch (error) {
       throw new Error(`The top-github-users directory exists but is not a valid git repository: ${error}`);
     }
@@ -118,7 +134,7 @@ export class UserProgressTracker {
 
     // Step 2: Get recent commits within the specified time period
     const commits = await this.getCommitsForTimeRange(request.days, request.maxCommits || 10);
-    console.log(`📅 Found ${commits.length} commits in top-github-users repository`);
+    console.log(`📅 Analyzing ${commits.length} commits over ${request.days} days`);
 
     if (commits.length === 0) {
       throw new Error(`No commits found in the top-github-users repository for the last ${request.days} days`);
@@ -174,10 +190,20 @@ export class UserProgressTracker {
    */
   private async getCommitsForTimeRange(days: number, maxCommits: number): Promise<Array<{ hash: string, date: Date }>> {
     try {
+      // Ensure we have the latest commits and full history
+      try {
+        await this.topGithubUsersGit.fetch();
+        console.log('📥 Fetched latest commits from remote');
+      } catch (fetchError) {
+        console.warn('⚠️  Could not fetch from remote, using local commits only');
+      }
+
       // Use the top-github-users repository for commit history
       const log = await this.topGithubUsersGit.log({
         maxCount: maxCommits
       });
+
+      console.log(`📊 Found ${log.all.length} total commits in git log`);
 
       const commits = log.all.map(commit => ({
         hash: commit.hash,
@@ -189,6 +215,8 @@ export class UserProgressTracker {
       sinceDate.setDate(sinceDate.getDate() - days);
 
       const filteredCommits = commits.filter(commit => commit.date >= sinceDate);
+      
+      console.log(`📅 Found ${filteredCommits.length} commits within ${days} days`);
 
       return filteredCommits.length > 0 ? filteredCommits : commits.slice(0, Math.min(3, commits.length));
     } catch (error) {

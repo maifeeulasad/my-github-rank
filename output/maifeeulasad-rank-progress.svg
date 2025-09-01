@@ -13,7 +13,7 @@
   </text>
   
   <text x="400" y="70" text-anchor="middle" fill="#cbd5e1" font-size="16" font-family="Arial, sans-serif">
-    BANGLADESH • 100 days • 1 commits
+    BANGLADESH • 100 days • 298 commits
   </text>
   
   <!-- Progress Cards -->
@@ -21,24 +21,24 @@
     <!-- Followers -->
     <rect width="200" height="100" fill="#1e293b" stroke="#334155" rx="8"/>
     <text x="100" y="25" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="bold">👥 FOLLOWERS</text>
-    <text x="100" y="55" text-anchor="middle" fill="#6b7280" font-size="28" font-weight="bold">→</text>
-    <text x="100" y="80" text-anchor="middle" fill="#f8fafc" font-size="16">0</text>
+    <text x="100" y="55" text-anchor="middle" fill="#ef4444" font-size="28" font-weight="bold">↘</text>
+    <text x="100" y="80" text-anchor="middle" fill="#f8fafc" font-size="16">-4</text>
   </g>
   
   <g transform="translate(300, 120)">
     <!-- Public -->
     <rect width="200" height="100" fill="#1e293b" stroke="#334155" rx="8"/>
     <text x="100" y="25" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="bold">🔓 PUBLIC</text>
-    <text x="100" y="55" text-anchor="middle" fill="#6b7280" font-size="28" font-weight="bold">→</text>
-    <text x="100" y="80" text-anchor="middle" fill="#f8fafc" font-size="16">0</text>
+    <text x="100" y="55" text-anchor="middle" fill="#22c55e" font-size="28" font-weight="bold">↗</text>
+    <text x="100" y="80" text-anchor="middle" fill="#f8fafc" font-size="16">+13</text>
   </g>
   
   <g transform="translate(520, 120)">
     <!-- Total -->
     <rect width="200" height="100" fill="#1e293b" stroke="#334155" rx="8"/>
     <text x="100" y="25" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="bold">📊 TOTAL</text>
-    <text x="100" y="55" text-anchor="middle" fill="#6b7280" font-size="28" font-weight="bold">→</text>
-    <text x="100" y="80" text-anchor="middle" fill="#f8fafc" font-size="16">0</text>
+    <text x="100" y="55" text-anchor="middle" fill="#22c55e" font-size="28" font-weight="bold">↗</text>
+    <text x="100" y="80" text-anchor="middle" fill="#f8fafc" font-size="16">+66</text>
   </g>
   
   <text x="400" y="380" text-anchor="middle" fill="#64748b" font-size="12">

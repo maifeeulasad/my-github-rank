@@ -54,13 +54,17 @@ export interface UserProgressSummary {
 
 export class UserProgressTracker {
   private repoPath: string;
+  private topGithubUsersPath: string;
   private markdownPath: string;
   private git: SimpleGit;
+  private topGithubUsersGit: SimpleGit;
 
   constructor(repositoryPath: string = process.cwd()) {
     this.repoPath = repositoryPath;
-    this.markdownPath = join(repositoryPath, 'src', 'top-github-users', 'markdown');
+    this.topGithubUsersPath = join(repositoryPath, 'src', 'top-github-users');
+    this.markdownPath = join(this.topGithubUsersPath, 'markdown');
     this.git = simpleGit(repositoryPath);
+    this.topGithubUsersGit = simpleGit(this.topGithubUsersPath);
   }
 
   /**
@@ -72,17 +76,16 @@ export class UserProgressTracker {
     // Check if the data directory exists
     try {
       await access(this.markdownPath, constants.F_OK);
+      console.log('✅ Found existing GitHub ranking data');
     } catch (error) {
       // Data not found, try to set it up
       console.log('📥 GitHub ranking data not found, attempting setup...');
       try {
-        const dataPath = join(this.repoPath, 'src', 'top-github-users');
-        
-        // Create directory if it doesn't exist
+        // Create parent directory if it doesn't exist
         await mkdir(join(this.repoPath, 'src'), { recursive: true });
         
         // Clone the repository
-        const cloneCommand = `git clone https://github.com/gayanvoice/top-github-users.git "${dataPath}"`;
+        const cloneCommand = `git clone https://github.com/gayanvoice/top-github-users.git "${this.topGithubUsersPath}"`;
         console.log(`🔄 Running: ${cloneCommand}`);
         
         await execAsync(cloneCommand, { 
@@ -99,6 +102,14 @@ export class UserProgressTracker {
       }
     }
 
+    // Ensure we have a proper git repository in the top-github-users directory
+    try {
+      await this.topGithubUsersGit.checkIsRepo();
+      console.log('✅ Confirmed top-github-users is a valid git repository');
+    } catch (error) {
+      throw new Error(`The top-github-users directory exists but is not a valid git repository: ${error}`);
+    }
+
     // Step 1: Find user's country
     const country = await this.findUserCountry(request.username);
     if (!country) {
@@ -109,10 +120,19 @@ export class UserProgressTracker {
 
     // Step 2: Get recent commits within the specified time period
     const commits = await this.getCommitsForTimeRange(request.days, request.maxCommits || 10);
-    console.log(`📅 Analyzing ${commits.length} commits over ${request.days} days`);
+    console.log(`📅 Found ${commits.length} commits in top-github-users repository`);
 
     if (commits.length === 0) {
-      throw new Error(`No commits found in the last ${request.days} days`);
+      throw new Error(`No commits found in the top-github-users repository for the last ${request.days} days`);
+    }
+
+    // Log commit details for debugging
+    console.log('📝 Commit details:');
+    commits.slice(0, 3).forEach(commit => {
+      console.log(`   ${commit.hash.substring(0, 8)} - ${commit.date.toISOString()}`);
+    });
+    if (commits.length > 3) {
+      console.log(`   ... and ${commits.length - 3} more commits`);
     }
 
     // Step 3: Get user ranking snapshots for each commit
@@ -156,7 +176,8 @@ export class UserProgressTracker {
    */
   private async getCommitsForTimeRange(days: number, maxCommits: number): Promise<Array<{ hash: string, date: Date }>> {
     try {
-      const log = await this.git.log({
+      // Use the top-github-users repository for commit history
+      const log = await this.topGithubUsersGit.log({
         maxCount: maxCommits
       });
 
@@ -188,24 +209,30 @@ export class UserProgressTracker {
   ): Promise<UserRankingSnapshot[]> {
     const snapshots: UserRankingSnapshot[] = [];
 
-    // Stash any uncommitted changes
+    // Stash any uncommitted changes in the top-github-users repository
     try {
-      await this.git.stash(['push', '-m', 'Auto-stash for user progress tracking']);
-      console.log('💾 Stashed uncommitted changes');
+      await this.topGithubUsersGit.stash(['push', '-m', 'Auto-stash for user progress tracking']);
+      console.log('💾 Stashed uncommitted changes in top-github-users');
     } catch (error) {
       // No changes to stash or already clean
     }
 
-    // Get current branch
-    const currentBranch = await this.git.branch();
-    const originalBranch = currentBranch.current;
+    // Get current branch/commit in top-github-users repository
+    let originalRef: string;
+    try {
+      const currentBranch = await this.topGithubUsersGit.branch();
+      originalRef = currentBranch.current || 'HEAD';
+    } catch (error) {
+      // Fallback to HEAD if we can't get branch info
+      originalRef = 'HEAD';
+    }
 
     for (const commit of commits) {
       try {
         console.log(`📸 Analyzing commit ${commit.hash.substring(0, 8)} from ${commit.date.toISOString()}`);
 
-        // Checkout to this commit
-        await this.git.checkout(commit.hash);
+        // Checkout to this commit in the top-github-users repository
+        await this.topGithubUsersGit.checkout(commit.hash);
 
         // Get user rankings for all three categories
         const followersRank = await this.getUserRankInFile(username, country, 'followers');
@@ -224,27 +251,41 @@ export class UserProgressTracker {
           totalContributions: totalContribRank?.value,
         };
 
+        // Log snapshot for debugging
+        if (followersRank || publicContribRank || totalContribRank) {
+          console.log(`   ✅ Found data: F:#${followersRank?.rank || 'N/A'} P:#${publicContribRank?.rank || 'N/A'} T:#${totalContribRank?.rank || 'N/A'}`);
+        } else {
+          console.log(`   ⚠️  No ranking data found in this commit`);
+        }
+
         snapshots.push(snapshot);
       } catch (error) {
         console.warn(`⚠️  Could not analyze commit ${commit.hash}: ${error}`);
       }
     }
 
-    // Checkout back to original branch
+    // Checkout back to original ref in top-github-users repository
     try {
-      await this.git.checkout(originalBranch || 'main');
+      await this.topGithubUsersGit.checkout(originalRef);
+      console.log(`🔄 Returned to ${originalRef} in top-github-users`);
     } catch {
       try {
-        await this.git.checkout('master');
+        await this.topGithubUsersGit.checkout('main');
+        console.log('🔄 Returned to main branch in top-github-users');
       } catch {
-        console.warn('Could not return to original branch');
+        try {
+          await this.topGithubUsersGit.checkout('master');
+          console.log('🔄 Returned to master branch in top-github-users');
+        } catch {
+          console.warn('⚠️  Could not return to original state in top-github-users');
+        }
       }
     }
 
-    // Restore stashed changes
+    // Restore stashed changes in top-github-users repository
     try {
-      await this.git.stash(['pop']);
-      console.log('🔄 Restored stashed changes');
+      await this.topGithubUsersGit.stash(['pop']);
+      console.log('🔄 Restored stashed changes in top-github-users');
     } catch (error) {
       // No stash to pop or other issue
     }

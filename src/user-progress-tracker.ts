@@ -56,21 +56,15 @@ export class UserProgressTracker {
   private repoPath: string;
   private topGithubUsersPath: string;
   private markdownPath: string;
-  private topGithubUsersGit: SimpleGit;
+  private topGithubUsersGit!: SimpleGit;
 
   constructor(repositoryPath: string = process.cwd()) {
     this.repoPath = repositoryPath;
     this.topGithubUsersPath = join(repositoryPath, 'src', 'top-github-users');
     this.markdownPath = join(this.topGithubUsersPath, 'markdown');
-    this.topGithubUsersGit = simpleGit(this.topGithubUsersPath);
   }
 
-  /**
-   * Main method to track user progress across commits
-   */
-  async trackUserProgress(request: UserProgressRequest): Promise<UserProgressSummary> {
-    console.log(`🔍 Tracking progress for @${request.username} over ${request.days} days...`);
-
+  async initialize() {
     // Check if the data directory exists
     try {
       await access(this.markdownPath, constants.F_OK);
@@ -99,6 +93,18 @@ export class UserProgressTracker {
         throw new Error(`GitHub ranking data not found at ${this.markdownPath} and auto-setup failed: ${setupError instanceof Error ? setupError.message : String(setupError)}`);
       }
     }
+
+    // Initialize git instance after ensuring directory exists
+    this.topGithubUsersGit = simpleGit(this.topGithubUsersPath);
+  }
+
+  /**
+   * Main method to track user progress across commits
+   */
+  async trackUserProgress(request: UserProgressRequest): Promise<UserProgressSummary> {
+    console.log(`🔍 Tracking progress for @${request.username} over ${request.days} days...`);
+
+    await this.initialize();
 
     // Ensure we have a proper git repository in the top-github-users directory
     try {

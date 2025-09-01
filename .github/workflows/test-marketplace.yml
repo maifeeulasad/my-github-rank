@@ -13,9 +13,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Show git log
-        run: cd ./src/top-github-users && git --no-pager log --oneline -10
-
       - name: Track GitHub User Progress
         uses: maifeeulasad/my-github-rank@v0.0.8
         id: tracker
@@ -23,6 +20,9 @@ jobs:
           username: ${{ github.repository_owner }}
           days: '100'
           max-commits: '10000'
+
+      - name: Show git log
+        run: cd ./src/top-github-users && git --no-pager log --oneline -10
           
       - name: Display Results
         run: |

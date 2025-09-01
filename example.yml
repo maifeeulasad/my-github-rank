@@ -27,6 +27,14 @@ jobs:
           echo "Public Contributions Rank Change: ${{ steps.tracker.outputs.public-contributions-rank-change }}"
           echo "Total Contributions Rank Change: ${{ steps.tracker.outputs.total-contributions-rank-change }}"
           echo "Commits Analyzed: ${{ steps.tracker.outputs.commits-analyzed }}"
+          echo "SVG Report: ${{ steps.tracker.outputs.svg-path }}"
           echo ""
           echo "Summary:"
           echo "${{ steps.tracker.outputs.summary }}"
+          
+      - name: Upload SVG Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: rank-progress-report
+          path: ${{ steps.tracker.outputs.svg-path }}
+          if-no-files-found: warn

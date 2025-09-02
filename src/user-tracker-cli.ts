@@ -126,9 +126,9 @@ function generateCountChart(snapshots: any[], x: number, y: number, width: numbe
   // Sort by date
   validSnapshots.sort((a, b) => new Date(a.commitDate).getTime() - new Date(b.commitDate).getTime());
   
-  const chartX = x + 20;
-  const chartY = y + 40;
-  const chartWidth = width - 40;
+  const chartX = x + 30;
+  const chartY = 40;
+  const chartWidth = width - 60;
   const chartHeight = height - 80;
   
   // Calculate scales
@@ -146,7 +146,7 @@ function generateCountChart(snapshots: any[], x: number, y: number, width: numbe
   const points = validSnapshots.map(s => {
     const relativeTime = (new Date(s.commitDate).getTime() - minDate) / dateRange;
     const relativeCount = (s[metric] - minCount) / countRange;
-    return `${chartX + relativeTime * chartWidth},${chartY + (1 - relativeCount) * chartHeight}`;
+    return `${30 + relativeTime * chartWidth},${40 + (1 - relativeCount) * chartHeight}`;
   });
   
   if (points.length < 2) return '';
@@ -154,18 +154,18 @@ function generateCountChart(snapshots: any[], x: number, y: number, width: numbe
   
   return `
   <!-- ${title} Chart -->
-  <g transform="translate(0, ${y})">
+  <g transform="translate(${x}, ${y})">
     <!-- Chart Background -->
-    <rect x="${x}" y="0" width="${width}" height="${height}" fill="#0f172a" stroke="#334155" stroke-width="1" rx="8" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="${width}" height="${height}" fill="#0f172a" stroke="#334155" stroke-width="1" rx="8" filter="url(#shadow)"/>
     
     <!-- Chart Title -->
-    <text x="${x + width/2}" y="25" text-anchor="middle" fill="#f8fafc" font-size="14" font-weight="bold" font-family="Arial, sans-serif">
+    <text x="${width/2}" y="25" text-anchor="middle" fill="#f8fafc" font-size="14" font-weight="bold" font-family="Arial, sans-serif">
       ${title}
     </text>
     
     <!-- Y-axis labels -->
-    <text x="${x + 10}" y="${y + 35}" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">${maxCount.toLocaleString()}</text>
-    <text x="${x + 10}" y="${y + height - 10}" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">${minCount.toLocaleString()}</text>
+    <text x="10" y="45" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">${maxCount.toLocaleString()}</text>
+    <text x="10" y="${height - 15}" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">${minCount.toLocaleString()}</text>
     
     <!-- Chart Line -->
     <path d="${path}" stroke="${color}" stroke-width="3" fill="none"/>

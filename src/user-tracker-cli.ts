@@ -37,6 +37,14 @@ export function generateProgressSVG(result: any): string {
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
       <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.3"/>
     </filter>
+    <!-- Trail effect filter -->
+    <filter id="trailGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
   
   <!-- Background -->
@@ -209,14 +217,28 @@ function generateCountChart(snapshots: any[], x: number, y: number, width: numbe
       <animate attributeName="opacity" values="0;1" dur="0.5s" begin="${animationDelay + 0.4}s" fill="freeze"/>
     </text>
     
-    <!-- Chart Line with draw animation -->
+    <!-- Chart Line with draw animation that follows the circle -->
     <path d="${path}" stroke="${color}" stroke-width="2" fill="none" stroke-dasharray="${pathLength}" stroke-dashoffset="${pathLength}">
-      <animate attributeName="stroke-dashoffset" values="${pathLength};0" dur="3s" begin="${animationDelay + 0.6}s" fill="freeze"/>
+      <animate attributeName="stroke-dashoffset" values="${pathLength};0" dur="3s" begin="${animationDelay + 0.8}s" fill="freeze"/>
     </path>
     
-    <!-- Animated circle that follows the line -->
-    <circle r="4" fill="${color}" opacity="0">
-      <animate attributeName="opacity" values="0;1;1;0" dur="3s" begin="${animationDelay + 0.6}s" fill="freeze"/>
+    <!-- Glow effect for the line that also follows the circle -->
+    <path d="${path}" stroke="${color}" stroke-width="4" fill="none" opacity="0.4" stroke-dasharray="${pathLength}" stroke-dashoffset="${pathLength}">
+      <animate attributeName="stroke-dashoffset" values="${pathLength};0" dur="3s" begin="${animationDelay + 0.8}s" fill="freeze"/>
+    </path>
+    
+    <!-- Animated circle that moves along the path and draws the line -->
+    <circle r="5" fill="${color}" opacity="0" filter="url(#trailGlow)">
+      <animate attributeName="opacity" values="0;1;1;1" dur="3.2s" begin="${animationDelay + 0.6}s" fill="freeze"/>
+      <animate attributeName="r" values="5;6;5" dur="1s" begin="${animationDelay + 0.6}s" repeatCount="3"/>
+      <animateMotion dur="3s" begin="${animationDelay + 0.6}s" fill="freeze">
+        <mpath href="#path_${metric}_${x}"/>
+      </animateMotion>
+    </circle>
+    
+    <!-- Small trail dots that fade out -->
+    <circle r="2" fill="${color}" opacity="0">
+      <animate attributeName="opacity" values="0;0.6;0" dur="0.8s" begin="${animationDelay + 1}s" fill="freeze"/>
       <animateMotion dur="3s" begin="${animationDelay + 0.6}s" fill="freeze">
         <mpath href="#path_${metric}_${x}"/>
       </animateMotion>
@@ -224,11 +246,6 @@ function generateCountChart(snapshots: any[], x: number, y: number, width: numbe
     
     <!-- Hidden path for motion animation -->
     <path id="path_${metric}_${x}" d="${path}" fill="none" stroke="none"/>
-    
-    <!-- Glow effect for the line -->
-    <path d="${path}" stroke="${color}" stroke-width="6" fill="none" opacity="0.3" stroke-dasharray="${pathLength}" stroke-dashoffset="${pathLength}">
-      <animate attributeName="stroke-dashoffset" values="${pathLength};0" dur="3s" begin="${animationDelay + 0.6}s" fill="freeze"/>
-    </path>
   </g>`;
 }
 

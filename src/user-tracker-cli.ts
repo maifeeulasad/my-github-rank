@@ -45,65 +45,95 @@ export function generateProgressSVG(result: any): string {
   <!-- Header -->
   <text x="${width/2}" y="40" text-anchor="middle" fill="#f8fafc" font-size="24" font-weight="bold" font-family="Arial, sans-serif">
     GitHub Progress Report
+    <animate attributeName="opacity" values="0;1" dur="0.8s" begin="0s" fill="freeze"/>
+    <animateTransform attributeName="transform" type="translate" values="0,-20;0,0" dur="0.8s" begin="0s" fill="freeze"/>
   </text>
   
   <!-- User Info -->
   <text x="${width/2}" y="70" text-anchor="middle" fill="#cbd5e1" font-size="16" font-family="Arial, sans-serif">
     @${result.username} • ${result.country.replace(/_/g, ' ').toUpperCase()} • ${result.daysAnalyzed} days analyzed
+    <animate attributeName="opacity" values="0;1" dur="0.6s" begin="0.3s" fill="freeze"/>
   </text>
   
   <!-- Progress Cards -->
   <!-- Followers Card -->
   <g transform="translate(${margin}, 100)">
-    <rect width="${chartWidth/3 - 20}" height="120" fill="#1e293b" stroke="#334155" stroke-width="1" rx="8" filter="url(#shadow)"/>
-    <text x="${(chartWidth/3 - 20)/2}" y="25" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="bold" font-family="Arial, sans-serif">👥 FOLLOWERS</text>
+    <rect width="${chartWidth/3 - 20}" height="120" fill="#1e293b" stroke="#334155" stroke-width="1" rx="8" filter="url(#shadow)">
+      <animate attributeName="opacity" values="0;1" dur="0.6s" begin="0.2s" fill="freeze"/>
+      <animateTransform attributeName="transform" type="scale" values="0.8;1" dur="0.6s" begin="0.2s" fill="freeze"/>
+    </rect>
+    <text x="${(chartWidth/3 - 20)/2}" y="25" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="bold" font-family="Arial, sans-serif">👥 FOLLOWERS
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="0.4s" fill="freeze"/>
+    </text>
     
     <text x="${(chartWidth/3 - 20)/2}" y="50" text-anchor="middle" fill="${followersInfo.color}" font-size="32" font-weight="bold" font-family="Arial, sans-serif">
       ${followersInfo.symbol}
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="0.6s" fill="freeze"/>
+      <animateTransform attributeName="transform" type="scale" values="0;1.2;1" dur="0.8s" begin="0.6s" fill="freeze"/>
     </text>
     
     <text x="${(chartWidth/3 - 20)/2}" y="75" text-anchor="middle" fill="#f8fafc" font-size="18" font-weight="bold" font-family="Arial, sans-serif">
       ${followersInfo.text}
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="0.8s" fill="freeze"/>
     </text>
     
     <text x="${(chartWidth/3 - 20)/2}" y="95" text-anchor="middle" fill="#94a3b8" font-size="12" font-family="Arial, sans-serif">
       ${result.followersProgress.startRank ? `#${result.followersProgress.startRank} → #${result.followersProgress.endRank}` : 'No data'}
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="1s" fill="freeze"/>
     </text>
   </g>
   
   <!-- Public Contributions Card -->
   <g transform="translate(${margin + chartWidth/3 + 10}, 100)">
-    <rect width="${chartWidth/3 - 20}" height="120" fill="#1e293b" stroke="#334155" stroke-width="1" rx="8" filter="url(#shadow)"/>
-    <text x="${(chartWidth/3 - 20)/2}" y="25" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="bold" font-family="Arial, sans-serif">🔓 PUBLIC</text>
+    <rect width="${chartWidth/3 - 20}" height="120" fill="#1e293b" stroke="#334155" stroke-width="1" rx="8" filter="url(#shadow)">
+      <animate attributeName="opacity" values="0;1" dur="0.6s" begin="0.4s" fill="freeze"/>
+      <animateTransform attributeName="transform" type="scale" values="0.8;1" dur="0.6s" begin="0.4s" fill="freeze"/>
+    </rect>
+    <text x="${(chartWidth/3 - 20)/2}" y="25" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="bold" font-family="Arial, sans-serif">🔓 PUBLIC
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="0.6s" fill="freeze"/>
+    </text>
     
     <text x="${(chartWidth/3 - 20)/2}" y="50" text-anchor="middle" fill="${publicInfo.color}" font-size="32" font-weight="bold" font-family="Arial, sans-serif">
       ${publicInfo.symbol}
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="0.8s" fill="freeze"/>
+      <animateTransform attributeName="transform" type="scale" values="0;1.2;1" dur="0.8s" begin="0.8s" fill="freeze"/>
     </text>
     
     <text x="${(chartWidth/3 - 20)/2}" y="75" text-anchor="middle" fill="#f8fafc" font-size="18" font-weight="bold" font-family="Arial, sans-serif">
       ${publicInfo.text}
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="1s" fill="freeze"/>
     </text>
     
     <text x="${(chartWidth/3 - 20)/2}" y="95" text-anchor="middle" fill="#94a3b8" font-size="12" font-family="Arial, sans-serif">
       ${result.publicContributionsProgress.startRank ? `#${result.publicContributionsProgress.startRank} → #${result.publicContributionsProgress.endRank}` : 'No data'}
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="1.2s" fill="freeze"/>
     </text>
   </g>
   
   <!-- Total Contributions Card -->
   <g transform="translate(${margin + 2 * (chartWidth/3 + 10)}, 100)">
-    <rect width="${chartWidth/3 - 20}" height="120" fill="#1e293b" stroke="#334155" stroke-width="1" rx="8" filter="url(#shadow)"/>
-    <text x="${(chartWidth/3 - 20)/2}" y="25" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="bold" font-family="Arial, sans-serif">📊 TOTAL</text>
+    <rect width="${chartWidth/3 - 20}" height="120" fill="#1e293b" stroke="#334155" stroke-width="1" rx="8" filter="url(#shadow)">
+      <animate attributeName="opacity" values="0;1" dur="0.6s" begin="0.6s" fill="freeze"/>
+      <animateTransform attributeName="transform" type="scale" values="0.8;1" dur="0.6s" begin="0.6s" fill="freeze"/>
+    </rect>
+    <text x="${(chartWidth/3 - 20)/2}" y="25" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="bold" font-family="Arial, sans-serif">📊 TOTAL
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="0.8s" fill="freeze"/>
+    </text>
     
     <text x="${(chartWidth/3 - 20)/2}" y="50" text-anchor="middle" fill="${totalInfo.color}" font-size="32" font-weight="bold" font-family="Arial, sans-serif">
       ${totalInfo.symbol}
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="1s" fill="freeze"/>
+      <animateTransform attributeName="transform" type="scale" values="0;1.2;1" dur="0.8s" begin="1s" fill="freeze"/>
     </text>
     
     <text x="${(chartWidth/3 - 20)/2}" y="75" text-anchor="middle" fill="#f8fafc" font-size="18" font-weight="bold" font-family="Arial, sans-serif">
       ${totalInfo.text}
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="1.2s" fill="freeze"/>
     </text>
     
     <text x="${(chartWidth/3 - 20)/2}" y="95" text-anchor="middle" fill="#94a3b8" font-size="12" font-family="Arial, sans-serif">
       ${result.totalContributionsProgress.startRank ? `#${result.totalContributionsProgress.startRank} → #${result.totalContributionsProgress.endRank}` : 'No data'}
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="1.4s" fill="freeze"/>
     </text>
   </g>
   
@@ -113,11 +143,12 @@ export function generateProgressSVG(result: any): string {
   <!-- Footer -->
   <text x="${width/2}" y="${height - 20}" text-anchor="middle" fill="#64748b" font-size="12" font-family="Arial, sans-serif">
     Generated by GitHub User Rank Tracker • ${new Date().toLocaleDateString()}
+    <animate attributeName="opacity" values="0;1" dur="0.5s" begin="5s" fill="freeze"/>
   </text>
 </svg>`.trim();
 }
 
-function generateCountChart(snapshots: any[], x: number, y: number, width: number, height: number, metric: string, title: string, color: string): string {
+function generateCountChart(snapshots: any[], x: number, y: number, width: number, height: number, metric: string, title: string, color: string, chartIndex: number = 0): string {
   if (snapshots.length < 2) return '';
   
   const validSnapshots = snapshots.filter(s => s[metric] !== undefined && s[metric] !== null);
@@ -151,27 +182,53 @@ function generateCountChart(snapshots: any[], x: number, y: number, width: numbe
   
   if (points.length < 2) return '';
   const path = `M ${points.join(' L ')}`;
+  const pathLength = points.length * 50; // Approximate path length for animation
+  
+  // Animation delay based on chart index (stagger animations)
+  const animationDelay = 1.8 + chartIndex * 0.5;
   
   return `
   <!-- ${title} Chart -->
   <g transform="translate(${x}, ${y})">
     <!-- Chart Background -->
-    <rect x="0" y="0" width="${width}" height="${height}" fill="#0f172a" stroke="#334155" stroke-width="1" rx="8" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="${width}" height="${height}" fill="#0f172a" stroke="#334155" stroke-width="1" rx="8" filter="url(#shadow)">
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="${animationDelay}s" fill="freeze"/>
+    </rect>
     
     <!-- Chart Title -->
     <text x="${width/2}" y="25" text-anchor="middle" fill="#f8fafc" font-size="14" font-weight="bold" font-family="Arial, sans-serif">
       ${title}
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="${animationDelay + 0.2}s" fill="freeze"/>
     </text>
     
     <!-- Y-axis labels -->
-    <text x="10" y="45" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">${maxCount.toLocaleString()}</text>
-    <text x="10" y="${height - 15}" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">${minCount.toLocaleString()}</text>
+    <text x="10" y="45" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">${maxCount.toLocaleString()}
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="${animationDelay + 0.4}s" fill="freeze"/>
+    </text>
+    <text x="10" y="${height - 15}" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">${minCount.toLocaleString()}
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="${animationDelay + 0.4}s" fill="freeze"/>
+    </text>
     
-    <!-- Chart Line -->
-    <path d="${path}" stroke="${color}" stroke-width="3" fill="none"/>
+    <!-- Chart Line with draw animation -->
+    <path d="${path}" stroke="${color}" stroke-width="2" fill="none" stroke-dasharray="${pathLength}" stroke-dashoffset="${pathLength}">
+      <animate attributeName="stroke-dashoffset" values="${pathLength};0" dur="3s" begin="${animationDelay + 0.6}s" fill="freeze"/>
+    </path>
     
-    <!-- Data points -->
-    ${points.map(point => `<circle cx="${point.split(',')[0]}" cy="${point.split(',')[1]}" r="3" fill="${color}"/>`).join('')}
+    <!-- Animated circle that follows the line -->
+    <circle r="4" fill="${color}" opacity="0">
+      <animate attributeName="opacity" values="0;1;1;0" dur="3s" begin="${animationDelay + 0.6}s" fill="freeze"/>
+      <animateMotion dur="3s" begin="${animationDelay + 0.6}s" fill="freeze">
+        <mpath href="#path_${metric}_${x}"/>
+      </animateMotion>
+    </circle>
+    
+    <!-- Hidden path for motion animation -->
+    <path id="path_${metric}_${x}" d="${path}" fill="none" stroke="none"/>
+    
+    <!-- Glow effect for the line -->
+    <path d="${path}" stroke="${color}" stroke-width="6" fill="none" opacity="0.3" stroke-dasharray="${pathLength}" stroke-dashoffset="${pathLength}">
+      <animate attributeName="stroke-dashoffset" values="${pathLength};0" dur="3s" begin="${animationDelay + 0.6}s" fill="freeze"/>
+    </path>
   </g>`;
 }
 
@@ -189,7 +246,8 @@ function generateThreeCharts(snapshots: any[], x: number, y: number, totalWidth:
     height, 
     'followersCount', 
     '👥 Followers Count', 
-    '#22c55e'
+    '#22c55e',
+    0 // chart index for animation delay
   );
   
   const publicChart = generateCountChart(
@@ -200,7 +258,8 @@ function generateThreeCharts(snapshots: any[], x: number, y: number, totalWidth:
     height, 
     'publicContributions', 
     '🔓 Public Contributions', 
-    '#3b82f6'
+    '#3b82f6',
+    1 // chart index for animation delay
   );
   
   const totalChart = generateCountChart(
@@ -211,7 +270,8 @@ function generateThreeCharts(snapshots: any[], x: number, y: number, totalWidth:
     height, 
     'totalContributions', 
     '📊 Total Contributions', 
-    '#f59e0b'
+    '#f59e0b',
+    2 // chart index for animation delay
   );
   
   return followersChart + publicChart + totalChart;

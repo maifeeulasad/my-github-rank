@@ -1,6 +1,6 @@
 {
   "name": "my-github-rank",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "type": "module",
   "description": "A simple GitHub Action to get GitHub rank of a user",
   "main": "dist/index.js",

@@ -54,20 +54,27 @@ async function run(): Promise<void> {
     core.setOutput('summary', summary);
     core.info('✅ User progress tracking completed successfully!');
 
-    // Generate SVG file
+    // Generate SVG files (both dark and light themes)
     try {
-      const svgContent = generateProgressSVG(result);
+      const darkSvgContent = generateProgressSVG(result, 'dark');
+      const lightSvgContent = generateProgressSVG(result, 'light');
       
       // Ensure output directory exists
       const outputDir = join(repoPath, 'output');
       await mkdir(outputDir, { recursive: true });
       
-      const outputPath = join(outputDir, `${username}-rank-progress.svg`);
-      await writeFile(outputPath, svgContent, 'utf-8');
-      core.setOutput('svg-path', outputPath);
-      core.info(`📊 SVG report generated: ${outputPath}`);
+      const darkOutputPath = join(outputDir, `${username}-rank-progress-dark.svg`);
+      const lightOutputPath = join(outputDir, `${username}-rank-progress-light.svg`);
+      
+      await writeFile(darkOutputPath, darkSvgContent, 'utf-8');
+      await writeFile(lightOutputPath, lightSvgContent, 'utf-8');
+      
+      core.setOutput('svg-dark-path', darkOutputPath);
+      core.setOutput('svg-light-path', lightOutputPath);
+      core.info(`📊 Dark theme SVG report generated: ${darkOutputPath}`);
+      core.info(`📊 Light theme SVG report generated: ${lightOutputPath}`);
     } catch (error) {
-      core.warning(`Could not generate SVG file: ${error instanceof Error ? error.message : String(error)}`);
+      core.warning(`Could not generate SVG files: ${error instanceof Error ? error.message : String(error)}`);
     }
     
   } catch (error) {

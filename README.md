@@ -14,7 +14,7 @@ This action analyzes a user's ranking changes across different metrics (follower
     media="(prefers-color-scheme: light)"
     srcset="output/maifeeulasad-rank-progress-light.svg"
   />
-  <img alt="Breakout Game" src="output/maifeeulasad-rank-progress-light.svg" />
+  <img alt="GitHub report card summary" src="output/maifeeulasad-rank-progress-light.svg" />
 </picture>
 
 ## Features

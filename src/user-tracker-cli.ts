@@ -44,7 +44,7 @@ export function generateProgressSVG(result: any): string {
   
   <!-- Header -->
   <text x="${width/2}" y="40" text-anchor="middle" fill="#f8fafc" font-size="24" font-weight="bold" font-family="Arial, sans-serif">
-    GitHub Rank Progress Report
+    GitHub Progress Report
   </text>
   
   <!-- User Info -->
@@ -107,8 +107,8 @@ export function generateProgressSVG(result: any): string {
     </text>
   </g>
   
-  <!-- Timeline Chart (if we have snapshots) -->
-  ${result.snapshots.length > 1 ? generateTimelineChart(result.snapshots, margin, 250, chartWidth, 200) : ''}
+  <!-- Timeline Charts (if we have snapshots) -->
+  ${result.snapshots.length > 1 ? generateThreeCharts(result.snapshots, margin, 250, chartWidth, 200) : ''}
   
   <!-- Footer -->
   <text x="${width/2}" y="${height - 20}" text-anchor="middle" fill="#64748b" font-size="12" font-family="Arial, sans-serif">
@@ -117,18 +117,18 @@ export function generateProgressSVG(result: any): string {
 </svg>`.trim();
 }
 
-function generateTimelineChart(snapshots: any[], x: number, y: number, width: number, height: number): string {
+function generateCountChart(snapshots: any[], x: number, y: number, width: number, height: number, metric: string, title: string, color: string): string {
   if (snapshots.length < 2) return '';
   
-  const validSnapshots = snapshots.filter(s => s.followersRank || s.publicContributionsRank || s.totalContributionsRank);
+  const validSnapshots = snapshots.filter(s => s[metric] !== undefined && s[metric] !== null);
   if (validSnapshots.length < 2) return '';
   
   // Sort by date
   validSnapshots.sort((a, b) => new Date(a.commitDate).getTime() - new Date(b.commitDate).getTime());
   
-  const chartX = x + 40;
+  const chartX = x + 20;
   const chartY = y + 40;
-  const chartWidth = width - 80;
+  const chartWidth = width - 40;
   const chartHeight = height - 80;
   
   // Calculate scales
@@ -136,58 +136,85 @@ function generateTimelineChart(snapshots: any[], x: number, y: number, width: nu
   const maxDate = new Date(validSnapshots[validSnapshots.length - 1].commitDate).getTime();
   const dateRange = maxDate - minDate || 1;
   
-  // Get rank ranges for scaling
-  const allRanks = validSnapshots.flatMap(s => [s.followersRank, s.publicContributionsRank, s.totalContributionsRank].filter(Boolean));
-  const minRank = Math.min(...allRanks);
-  const maxRank = Math.max(...allRanks);
-  const rankRange = maxRank - minRank || 1;
+  // Get count ranges for scaling
+  const allCounts = validSnapshots.map(s => s[metric]).filter(Boolean);
+  const minCount = Math.min(...allCounts);
+  const maxCount = Math.max(...allCounts);
+  const countRange = maxCount - minCount || 1;
   
-  // Generate path data for each metric
-  const generatePath = (metric: string) => {
-    const points = validSnapshots
-      .filter(s => s[metric])
-      .map(s => {
-        const relativeTime = (new Date(s.commitDate).getTime() - minDate) / dateRange;
-        const relativeRank = (maxRank - s[metric]) / rankRange; // Invert because lower rank is better
-        return `${chartX + relativeTime * chartWidth},${chartY + relativeRank * chartHeight}`;
-      });
-    
-    if (points.length < 2) return '';
-    return `M ${points.join(' L ')}`;
-  };
+  // Generate path data
+  const points = validSnapshots.map(s => {
+    const relativeTime = (new Date(s.commitDate).getTime() - minDate) / dateRange;
+    const relativeCount = (s[metric] - minCount) / countRange;
+    return `${chartX + relativeTime * chartWidth},${chartY + (1 - relativeCount) * chartHeight}`;
+  });
   
-  const followersPath = generatePath('followersRank');
-  const publicPath = generatePath('publicContributionsRank');
-  const totalPath = generatePath('totalContributionsRank');
+  if (points.length < 2) return '';
+  const path = `M ${points.join(' L ')}`;
   
   return `
-  <!-- Timeline Chart -->
+  <!-- ${title} Chart -->
   <g transform="translate(0, ${y})">
     <!-- Chart Background -->
     <rect x="${x}" y="0" width="${width}" height="${height}" fill="#0f172a" stroke="#334155" stroke-width="1" rx="8" filter="url(#shadow)"/>
     
     <!-- Chart Title -->
-    <text x="${x + width/2}" y="25" text-anchor="middle" fill="#f8fafc" font-size="16" font-weight="bold" font-family="Arial, sans-serif">
-      📈 Ranking Progression
+    <text x="${x + width/2}" y="25" text-anchor="middle" fill="#f8fafc" font-size="14" font-weight="bold" font-family="Arial, sans-serif">
+      ${title}
     </text>
     
-    <!-- Chart Lines -->
-    ${followersPath ? `<path d="${followersPath}" stroke="#22c55e" stroke-width="2" fill="none"/>` : ''}
-    ${publicPath ? `<path d="${publicPath}" stroke="#3b82f6" stroke-width="2" fill="none"/>` : ''}
-    ${totalPath ? `<path d="${totalPath}" stroke="#f59e0b" stroke-width="2" fill="none"/>` : ''}
+    <!-- Y-axis labels -->
+    <text x="${x + 10}" y="${y + 35}" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">${maxCount.toLocaleString()}</text>
+    <text x="${x + 10}" y="${y + height - 10}" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">${minCount.toLocaleString()}</text>
     
-    <!-- Legend -->
-    <g transform="translate(${x + 20}, ${height - 40})">
-      <circle cx="0" cy="0" r="4" fill="#22c55e"/>
-      <text x="10" y="4" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Followers</text>
-      
-      <circle cx="80" cy="0" r="4" fill="#3b82f6"/>
-      <text x="90" y="4" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Public</text>
-      
-      <circle cx="140" cy="0" r="4" fill="#f59e0b"/>
-      <text x="150" y="4" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">Total</text>
-    </g>
+    <!-- Chart Line -->
+    <path d="${path}" stroke="${color}" stroke-width="3" fill="none"/>
+    
+    <!-- Data points -->
+    ${points.map(point => `<circle cx="${point.split(',')[0]}" cy="${point.split(',')[1]}" r="3" fill="${color}"/>`).join('')}
   </g>`;
+}
+
+function generateThreeCharts(snapshots: any[], x: number, y: number, totalWidth: number, height: number): string {
+  if (snapshots.length < 2) return '';
+  
+  const chartWidth = (totalWidth - 40) / 3; // 3 charts with spacing
+  const spacing = 20;
+  
+  const followersChart = generateCountChart(
+    snapshots, 
+    x, 
+    y, 
+    chartWidth, 
+    height, 
+    'followersCount', 
+    '👥 Followers Count', 
+    '#22c55e'
+  );
+  
+  const publicChart = generateCountChart(
+    snapshots, 
+    x + chartWidth + spacing, 
+    y, 
+    chartWidth, 
+    height, 
+    'publicContributions', 
+    '🔓 Public Contributions', 
+    '#3b82f6'
+  );
+  
+  const totalChart = generateCountChart(
+    snapshots, 
+    x + 2 * (chartWidth + spacing), 
+    y, 
+    chartWidth, 
+    height, 
+    'totalContributions', 
+    '📊 Total Contributions', 
+    '#f59e0b'
+  );
+  
+  return followersChart + publicChart + totalChart;
 }
 
 async function main() {

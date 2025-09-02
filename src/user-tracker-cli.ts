@@ -649,6 +649,12 @@ The tool will:
   }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// Only run CLI if this file is executed directly (not imported)
+// Check for both Node.js execution and bundled environments
+const isMainModule = import.meta.url === `file://${process.argv[1]}` || 
+                     (typeof require !== 'undefined' && require.main === module) ||
+                     (process.env.NODE_ENV !== 'github-action' && process.argv[1]?.endsWith('user-tracker-cli.ts'));
+
+if (isMainModule && !process.env.GITHUB_ACTIONS) {
   main().catch(console.error);
 }

@@ -9,7 +9,7 @@
     "package": "ncc build src/main.ts -o dist --source-map --license licenses.txt",
     "test": "jest",
     "all": "npm run build && npm run package",
-    "track": "node --loader ts-node/esm src/user-tracker-cli.ts",
+    "track": "node --loader ts-node/esm src/cli.ts",
     "setup-data": "[ ! -d 'src/top-github-users' ] && git clone https://github.com/gayanvoice/top-github-users.git src/top-github-users || echo 'Data already exists'",
     "update-data": "cd src/top-github-users && git pull origin main",
     "postinstall": "npm run setup-data"

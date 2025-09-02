@@ -9,7 +9,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const repoPath = join(__dirname, '..');
 
-function generateProgressSVG(result: any): string {
+export function generateProgressSVG(result: any): string {
   const width = 800;
   const height = 600;
   const margin = 60;

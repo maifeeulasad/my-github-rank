@@ -9,12 +9,37 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const repoPath = join(__dirname, '..');
 
-export function generateProgressSVG(result: any): string {
+export function generateProgressSVG(result: any, theme: 'dark' | 'light' = 'dark'): string {
   const width = 800;
   const height = 600;
   const margin = 60;
   const chartWidth = width - 2 * margin;
   const chartHeight = height - 2 * margin;
+
+  // Theme-specific colors
+  const colors = theme === 'dark' ? {
+    background: { start: '#1e293b', end: '#0f172a' },
+    cardBackground: '#1e293b',
+    cardBorder: '#334155',
+    chartBackground: '#0f172a',
+    chartBorder: '#334155',
+    headerText: '#f8fafc',
+    subText: '#cbd5e1',
+    labelText: '#94a3b8',
+    valueText: '#f8fafc',
+    footerText: '#64748b'
+  } : {
+    background: { start: '#f8fafc', end: '#e2e8f0' },
+    cardBackground: '#ffffff',
+    cardBorder: '#e2e8f0',
+    chartBackground: '#ffffff',
+    chartBorder: '#e2e8f0',
+    headerText: '#0f172a',
+    subText: '#475569',
+    labelText: '#64748b',
+    valueText: '#1e293b',
+    footerText: '#94a3b8'
+  };
 
   // Helper function to get rank change symbol and color
   const getRankInfo = (rankChange: number) => {
@@ -31,11 +56,11 @@ export function generateProgressSVG(result: any): string {
 <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#1e293b;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#0f172a;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:${colors.background.start};stop-opacity:1" />
+      <stop offset="100%" style="stop-color:${colors.background.end};stop-opacity:1" />
     </linearGradient>
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.3"/>
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="${theme === 'dark' ? '#000' : '#00000020'}" flood-opacity="${theme === 'dark' ? '0.3' : '0.1'}"/>
     </filter>
     <!-- Trail effect filter -->
     <filter id="trailGlow" x="-50%" y="-50%" width="200%" height="200%">
@@ -51,14 +76,14 @@ export function generateProgressSVG(result: any): string {
   <rect width="${width}" height="${height}" fill="url(#bgGradient)" rx="12"/>
   
   <!-- Header -->
-  <text x="${width/2}" y="40" text-anchor="middle" fill="#f8fafc" font-size="24" font-weight="bold" font-family="Arial, sans-serif">
+  <text x="${width/2}" y="40" text-anchor="middle" fill="${colors.headerText}" font-size="24" font-weight="bold" font-family="Arial, sans-serif">
     GitHub Progress Report
     <animate attributeName="opacity" values="0;1" dur="0.8s" begin="0s" fill="freeze"/>
     <animateTransform attributeName="transform" type="translate" values="0,-20;0,0" dur="0.8s" begin="0s" fill="freeze"/>
   </text>
   
   <!-- User Info -->
-  <text x="${width/2}" y="70" text-anchor="middle" fill="#cbd5e1" font-size="16" font-family="Arial, sans-serif">
+  <text x="${width/2}" y="70" text-anchor="middle" fill="${colors.subText}" font-size="16" font-family="Arial, sans-serif">
     @${result.username} • ${result.country.replace(/_/g, ' ').toUpperCase()} • ${result.daysAnalyzed} days analyzed
     <animate attributeName="opacity" values="0;1" dur="0.6s" begin="0.3s" fill="freeze"/>
   </text>
@@ -66,11 +91,11 @@ export function generateProgressSVG(result: any): string {
   <!-- Progress Cards -->
   <!-- Followers Card -->
   <g transform="translate(${margin}, 100)">
-    <rect width="${chartWidth/3 - 20}" height="120" fill="#1e293b" stroke="#334155" stroke-width="1" rx="8" filter="url(#shadow)">
+    <rect width="${chartWidth/3 - 20}" height="120" fill="${colors.cardBackground}" stroke="${colors.cardBorder}" stroke-width="1" rx="8" filter="url(#shadow)">
       <animate attributeName="opacity" values="0;1" dur="0.6s" begin="0.2s" fill="freeze"/>
       <animateTransform attributeName="transform" type="scale" values="0.8;1" dur="0.6s" begin="0.2s" fill="freeze"/>
     </rect>
-    <text x="${(chartWidth/3 - 20)/2}" y="25" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="bold" font-family="Arial, sans-serif">👥 FOLLOWERS
+    <text x="${(chartWidth/3 - 20)/2}" y="25" text-anchor="middle" fill="${colors.labelText}" font-size="14" font-weight="bold" font-family="Arial, sans-serif">👥 FOLLOWERS
       <animate attributeName="opacity" values="0;1" dur="0.5s" begin="0.4s" fill="freeze"/>
     </text>
     
@@ -80,12 +105,12 @@ export function generateProgressSVG(result: any): string {
       <animateTransform attributeName="transform" type="scale" values="0;1.2;1" dur="0.8s" begin="0.6s" fill="freeze"/>
     </text>
     
-    <text x="${(chartWidth/3 - 20)/2}" y="75" text-anchor="middle" fill="#f8fafc" font-size="18" font-weight="bold" font-family="Arial, sans-serif">
+    <text x="${(chartWidth/3 - 20)/2}" y="75" text-anchor="middle" fill="${colors.valueText}" font-size="18" font-weight="bold" font-family="Arial, sans-serif">
       ${followersInfo.text}
       <animate attributeName="opacity" values="0;1" dur="0.5s" begin="0.8s" fill="freeze"/>
     </text>
     
-    <text x="${(chartWidth/3 - 20)/2}" y="95" text-anchor="middle" fill="#94a3b8" font-size="12" font-family="Arial, sans-serif">
+    <text x="${(chartWidth/3 - 20)/2}" y="95" text-anchor="middle" fill="${colors.labelText}" font-size="12" font-family="Arial, sans-serif">
       ${result.followersProgress.startRank ? `#${result.followersProgress.startRank} → #${result.followersProgress.endRank}` : 'No data'}
       <animate attributeName="opacity" values="0;1" dur="0.5s" begin="1s" fill="freeze"/>
     </text>
@@ -93,11 +118,11 @@ export function generateProgressSVG(result: any): string {
   
   <!-- Public Contributions Card -->
   <g transform="translate(${margin + chartWidth/3 + 10}, 100)">
-    <rect width="${chartWidth/3 - 20}" height="120" fill="#1e293b" stroke="#334155" stroke-width="1" rx="8" filter="url(#shadow)">
+    <rect width="${chartWidth/3 - 20}" height="120" fill="${colors.cardBackground}" stroke="${colors.cardBorder}" stroke-width="1" rx="8" filter="url(#shadow)">
       <animate attributeName="opacity" values="0;1" dur="0.6s" begin="0.4s" fill="freeze"/>
       <animateTransform attributeName="transform" type="scale" values="0.8;1" dur="0.6s" begin="0.4s" fill="freeze"/>
     </rect>
-    <text x="${(chartWidth/3 - 20)/2}" y="25" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="bold" font-family="Arial, sans-serif">🔓 PUBLIC
+    <text x="${(chartWidth/3 - 20)/2}" y="25" text-anchor="middle" fill="${colors.labelText}" font-size="14" font-weight="bold" font-family="Arial, sans-serif">🔓 PUBLIC
       <animate attributeName="opacity" values="0;1" dur="0.5s" begin="0.6s" fill="freeze"/>
     </text>
     
@@ -107,12 +132,12 @@ export function generateProgressSVG(result: any): string {
       <animateTransform attributeName="transform" type="scale" values="0;1.2;1" dur="0.8s" begin="0.8s" fill="freeze"/>
     </text>
     
-    <text x="${(chartWidth/3 - 20)/2}" y="75" text-anchor="middle" fill="#f8fafc" font-size="18" font-weight="bold" font-family="Arial, sans-serif">
+    <text x="${(chartWidth/3 - 20)/2}" y="75" text-anchor="middle" fill="${colors.valueText}" font-size="18" font-weight="bold" font-family="Arial, sans-serif">
       ${publicInfo.text}
       <animate attributeName="opacity" values="0;1" dur="0.5s" begin="1s" fill="freeze"/>
     </text>
     
-    <text x="${(chartWidth/3 - 20)/2}" y="95" text-anchor="middle" fill="#94a3b8" font-size="12" font-family="Arial, sans-serif">
+    <text x="${(chartWidth/3 - 20)/2}" y="95" text-anchor="middle" fill="${colors.labelText}" font-size="12" font-family="Arial, sans-serif">
       ${result.publicContributionsProgress.startRank ? `#${result.publicContributionsProgress.startRank} → #${result.publicContributionsProgress.endRank}` : 'No data'}
       <animate attributeName="opacity" values="0;1" dur="0.5s" begin="1.2s" fill="freeze"/>
     </text>
@@ -120,11 +145,11 @@ export function generateProgressSVG(result: any): string {
   
   <!-- Total Contributions Card -->
   <g transform="translate(${margin + 2 * (chartWidth/3 + 10)}, 100)">
-    <rect width="${chartWidth/3 - 20}" height="120" fill="#1e293b" stroke="#334155" stroke-width="1" rx="8" filter="url(#shadow)">
+    <rect width="${chartWidth/3 - 20}" height="120" fill="${colors.cardBackground}" stroke="${colors.cardBorder}" stroke-width="1" rx="8" filter="url(#shadow)">
       <animate attributeName="opacity" values="0;1" dur="0.6s" begin="0.6s" fill="freeze"/>
       <animateTransform attributeName="transform" type="scale" values="0.8;1" dur="0.6s" begin="0.6s" fill="freeze"/>
     </rect>
-    <text x="${(chartWidth/3 - 20)/2}" y="25" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="bold" font-family="Arial, sans-serif">📊 TOTAL
+    <text x="${(chartWidth/3 - 20)/2}" y="25" text-anchor="middle" fill="${colors.labelText}" font-size="14" font-weight="bold" font-family="Arial, sans-serif">📊 TOTAL
       <animate attributeName="opacity" values="0;1" dur="0.5s" begin="0.8s" fill="freeze"/>
     </text>
     
@@ -134,33 +159,46 @@ export function generateProgressSVG(result: any): string {
       <animateTransform attributeName="transform" type="scale" values="0;1.2;1" dur="0.8s" begin="1s" fill="freeze"/>
     </text>
     
-    <text x="${(chartWidth/3 - 20)/2}" y="75" text-anchor="middle" fill="#f8fafc" font-size="18" font-weight="bold" font-family="Arial, sans-serif">
+    <text x="${(chartWidth/3 - 20)/2}" y="75" text-anchor="middle" fill="${colors.valueText}" font-size="18" font-weight="bold" font-family="Arial, sans-serif">
       ${totalInfo.text}
       <animate attributeName="opacity" values="0;1" dur="0.5s" begin="1.2s" fill="freeze"/>
     </text>
     
-    <text x="${(chartWidth/3 - 20)/2}" y="95" text-anchor="middle" fill="#94a3b8" font-size="12" font-family="Arial, sans-serif">
+    <text x="${(chartWidth/3 - 20)/2}" y="95" text-anchor="middle" fill="${colors.labelText}" font-size="12" font-family="Arial, sans-serif">
       ${result.totalContributionsProgress.startRank ? `#${result.totalContributionsProgress.startRank} → #${result.totalContributionsProgress.endRank}` : 'No data'}
       <animate attributeName="opacity" values="0;1" dur="0.5s" begin="1.4s" fill="freeze"/>
     </text>
   </g>
   
   <!-- Timeline Charts (if we have snapshots) -->
-  ${result.snapshots.length > 1 ? generateThreeCharts(result.snapshots, margin, 250, chartWidth, 200) : ''}
+  ${result.snapshots.length > 1 ? generateThreeCharts(result.snapshots, margin, 250, chartWidth, 200, theme) : ''}
   
   <!-- Footer -->
-  <text x="${width/2}" y="${height - 20}" text-anchor="middle" fill="#64748b" font-size="12" font-family="Arial, sans-serif">
+  <text x="${width/2}" y="${height - 20}" text-anchor="middle" fill="${colors.footerText}" font-size="12" font-family="Arial, sans-serif">
     Generated by GitHub User Rank Tracker • ${new Date().toLocaleDateString()}
     <animate attributeName="opacity" values="0;1" dur="0.5s" begin="5s" fill="freeze"/>
   </text>
 </svg>`.trim();
 }
 
-function generateCountChart(snapshots: any[], x: number, y: number, width: number, height: number, metric: string, title: string, color: string, chartIndex: number = 0): string {
+function generateCountChart(snapshots: any[], x: number, y: number, width: number, height: number, metric: string, title: string, color: string, chartIndex: number = 0, theme: 'dark' | 'light' = 'dark'): string {
   if (snapshots.length < 2) return '';
   
   const validSnapshots = snapshots.filter(s => s[metric] !== undefined && s[metric] !== null);
   if (validSnapshots.length < 2) return '';
+  
+  // Theme-specific colors
+  const colors = theme === 'dark' ? {
+    background: '#0f172a',
+    border: '#334155',
+    title: '#f8fafc',
+    labels: '#94a3b8'
+  } : {
+    background: '#ffffff',
+    border: '#e2e8f0',
+    title: '#1e293b',
+    labels: '#64748b'
+  };
   
   // Sort by date
   validSnapshots.sort((a, b) => new Date(a.commitDate).getTime() - new Date(b.commitDate).getTime());
@@ -199,21 +237,21 @@ function generateCountChart(snapshots: any[], x: number, y: number, width: numbe
   <!-- ${title} Chart -->
   <g transform="translate(${x}, ${y})">
     <!-- Chart Background -->
-    <rect x="0" y="0" width="${width}" height="${height}" fill="#0f172a" stroke="#334155" stroke-width="1" rx="8" filter="url(#shadow)">
+    <rect x="0" y="0" width="${width}" height="${height}" fill="${colors.background}" stroke="${colors.border}" stroke-width="1" rx="8" filter="url(#shadow)">
       <animate attributeName="opacity" values="0;1" dur="0.5s" begin="${animationDelay}s" fill="freeze"/>
     </rect>
     
     <!-- Chart Title -->
-    <text x="${width/2}" y="25" text-anchor="middle" fill="#f8fafc" font-size="14" font-weight="bold" font-family="Arial, sans-serif">
+    <text x="${width/2}" y="25" text-anchor="middle" fill="${colors.title}" font-size="14" font-weight="bold" font-family="Arial, sans-serif">
       ${title}
       <animate attributeName="opacity" values="0;1" dur="0.5s" begin="${animationDelay + 0.2}s" fill="freeze"/>
     </text>
     
     <!-- Y-axis labels -->
-    <text x="10" y="45" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">${maxCount.toLocaleString()}
+    <text x="10" y="45" fill="${colors.labels}" font-size="10" font-family="Arial, sans-serif">${maxCount.toLocaleString()}
       <animate attributeName="opacity" values="0;1" dur="0.5s" begin="${animationDelay + 0.4}s" fill="freeze"/>
     </text>
-    <text x="10" y="${height - 15}" fill="#94a3b8" font-size="10" font-family="Arial, sans-serif">${minCount.toLocaleString()}
+    <text x="10" y="${height - 15}" fill="${colors.labels}" font-size="10" font-family="Arial, sans-serif">${minCount.toLocaleString()}
       <animate attributeName="opacity" values="0;1" dur="0.5s" begin="${animationDelay + 0.4}s" fill="freeze"/>
     </text>
     
@@ -249,7 +287,7 @@ function generateCountChart(snapshots: any[], x: number, y: number, width: numbe
   </g>`;
 }
 
-function generateThreeCharts(snapshots: any[], x: number, y: number, totalWidth: number, height: number): string {
+function generateThreeCharts(snapshots: any[], x: number, y: number, totalWidth: number, height: number, theme: 'dark' | 'light' = 'dark'): string {
   if (snapshots.length < 2) return '';
   
   const chartWidth = (totalWidth - 40) / 3; // 3 charts with spacing
@@ -264,7 +302,8 @@ function generateThreeCharts(snapshots: any[], x: number, y: number, totalWidth:
     'followersCount', 
     '👥 Followers Count', 
     '#22c55e',
-    0 // chart index for animation delay
+    0, // chart index for animation delay
+    theme
   );
   
   const publicChart = generateCountChart(
@@ -276,7 +315,8 @@ function generateThreeCharts(snapshots: any[], x: number, y: number, totalWidth:
     'publicContributions', 
     '🔓 Public Contributions', 
     '#3b82f6',
-    1 // chart index for animation delay
+    1, // chart index for animation delay
+    theme
   );
   
   const totalChart = generateCountChart(
@@ -288,7 +328,8 @@ function generateThreeCharts(snapshots: any[], x: number, y: number, totalWidth:
     'totalContributions', 
     '📊 Total Contributions', 
     '#f59e0b',
-    2 // chart index for animation delay
+    2, // chart index for animation delay
+    theme
   );
   
   return followersChart + publicChart + totalChart;
@@ -426,12 +467,14 @@ The tool will:
     console.log('');
     console.log('✅ Analysis complete!');
 
-    // Generate SVG file
-    console.log('🎨 Generating SVG report...');
+    // Generate SVG files (both dark and light themes)
+    console.log('🎨 Generating SVG reports...');
     try {
-      const svgContent = generateProgressSVG(result);
+      const darkSvgContent = generateProgressSVG(result, 'dark');
+      const lightSvgContent = generateProgressSVG(result, 'light');
       const outputDir = join(repoPath, 'output');
-      const svgPath = join(outputDir, `${username}-rank-progress.svg`);
+      const darkSvgPath = join(outputDir, `${username}-rank-progress-dark.svg`);
+      const lightSvgPath = join(outputDir, `${username}-rank-progress-light.svg`);
       
       // Create output directory if it doesn't exist
       try {
@@ -440,8 +483,10 @@ The tool will:
         // Directory might already exist
       }
       
-      await writeFile(svgPath, svgContent, 'utf-8');
-      console.log(`📊 SVG report saved to: ${svgPath}`);
+      await writeFile(darkSvgPath, darkSvgContent, 'utf-8');
+      await writeFile(lightSvgPath, lightSvgContent, 'utf-8');
+      console.log(`📊 Dark theme SVG report saved to: ${darkSvgPath}`);
+      console.log(`📊 Light theme SVG report saved to: ${lightSvgPath}`);
     } catch (error) {
       console.warn('⚠️  Could not generate SVG file:', error instanceof Error ? error.message : String(error));
     }

@@ -16,6 +16,9 @@ export function generateProgressSVG(result: any, theme: 'dark' | 'light' = 'dark
   const chartWidth = width - 2 * margin;
   const chartHeight = height - 2 * margin;
 
+  // Check if this is a motivational report (user not found)
+  const isMotivational = result.country === 'global' && result.commitsAnalyzed === 0;
+
   // Theme-specific colors
   const colors = theme === 'dark' ? {
     background: { start: '#1e293b', end: '#0f172a' },
@@ -40,6 +43,10 @@ export function generateProgressSVG(result: any, theme: 'dark' | 'light' = 'dark
     valueText: '#1e293b',
     footerText: '#94a3b8'
   };
+
+  if (isMotivational) {
+    return generateMotivationalSVG(result, theme, colors, width, height);
+  }
 
   // Helper function to get rank change symbol and color
   const getRankInfo = (rankChange: number) => {
@@ -95,7 +102,7 @@ export function generateProgressSVG(result: any, theme: 'dark' | 'light' = 'dark
       <animate attributeName="opacity" values="0;1" dur="0.6s" begin="0.2s" fill="freeze"/>
       <animateTransform attributeName="transform" type="scale" values="0.8;1" dur="0.6s" begin="0.2s" fill="freeze"/>
     </rect>
-    <text x="${(chartWidth/3 - 20)/2}" y="25" text-anchor="middle" fill="${colors.labelText}" font-size="14" font-weight="bold" font-family="Arial, sans-serif">👥 FOLLOWERS
+    <text x="${(chartWidth/3 - 20)/2}" y="25" text-anchor="middle" fill="${colors.labelText}" font-size="14" font-weight="bold" font-family="Arial, sans-serif">FOLLOWERS
       <animate attributeName="opacity" values="0;1" dur="0.5s" begin="0.4s" fill="freeze"/>
     </text>
     
@@ -122,7 +129,7 @@ export function generateProgressSVG(result: any, theme: 'dark' | 'light' = 'dark
       <animate attributeName="opacity" values="0;1" dur="0.6s" begin="0.4s" fill="freeze"/>
       <animateTransform attributeName="transform" type="scale" values="0.8;1" dur="0.6s" begin="0.4s" fill="freeze"/>
     </rect>
-    <text x="${(chartWidth/3 - 20)/2}" y="25" text-anchor="middle" fill="${colors.labelText}" font-size="14" font-weight="bold" font-family="Arial, sans-serif">🔓 PUBLIC
+    <text x="${(chartWidth/3 - 20)/2}" y="25" text-anchor="middle" fill="${colors.labelText}" font-size="14" font-weight="bold" font-family="Arial, sans-serif">PUBLIC
       <animate attributeName="opacity" values="0;1" dur="0.5s" begin="0.6s" fill="freeze"/>
     </text>
     
@@ -149,7 +156,7 @@ export function generateProgressSVG(result: any, theme: 'dark' | 'light' = 'dark
       <animate attributeName="opacity" values="0;1" dur="0.6s" begin="0.6s" fill="freeze"/>
       <animateTransform attributeName="transform" type="scale" values="0.8;1" dur="0.6s" begin="0.6s" fill="freeze"/>
     </rect>
-    <text x="${(chartWidth/3 - 20)/2}" y="25" text-anchor="middle" fill="${colors.labelText}" font-size="14" font-weight="bold" font-family="Arial, sans-serif">📊 TOTAL
+    <text x="${(chartWidth/3 - 20)/2}" y="25" text-anchor="middle" fill="${colors.labelText}" font-size="14" font-weight="bold" font-family="Arial, sans-serif">TOTAL
       <animate attributeName="opacity" values="0;1" dur="0.5s" begin="0.8s" fill="freeze"/>
     </text>
     
@@ -333,6 +340,151 @@ function generateThreeCharts(snapshots: any[], x: number, y: number, totalWidth:
   );
   
   return followersChart + publicChart + totalChart;
+}
+
+function generateMotivationalSVG(result: any, theme: 'dark' | 'light', colors: any, width: number, height: number): string {
+  // Get motivational quotes (same as in the tracker)
+  const motivationalQuotes = [
+    "🌟 Every expert was once a beginner. Keep pushing forward!",
+    "🚀 Your coding journey is just getting started. The best is yet to come!",
+    "💪 Great developers aren't born, they're made through persistence and practice.",
+    "🎯 Rome wasn't built in a day, neither are great GitHub profiles. Keep coding!",
+    "✨ Every commit is a step forward. Your dedication will pay off!",
+    "🔥 The only way to do great work is to love what you do. Keep growing!",
+    "🌈 Success is not final, failure is not fatal. Keep coding with courage!",
+    "⭐ Your potential is limitless. Keep pushing your boundaries!",
+    "🎖️ Champions are made in practice, not just in competition. Keep coding!",
+    "🌟 The journey of a thousand commits begins with a single push!"
+  ];
+
+  const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+
+  return `
+<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:${colors.background.start};stop-opacity:1" />
+      <stop offset="100%" style="stop-color:${colors.background.end};stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="${theme === 'dark' ? '#000' : '#00000020'}" flood-opacity="${theme === 'dark' ? '0.3' : '0.1'}"/>
+    </filter>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="${width}" height="${height}" fill="url(#bgGradient)" rx="12"/>
+  
+  <!-- Header -->
+  <text x="${width/2}" y="80" text-anchor="middle" fill="${colors.headerText}" font-size="28" font-weight="bold" font-family="Arial, sans-serif">
+    GitHub Journey Report
+    <animate attributeName="opacity" values="0;1" dur="1s" begin="0s" fill="freeze"/>
+    <animateTransform attributeName="transform" type="translate" values="0,-30;0,0" dur="1s" begin="0s" fill="freeze"/>
+  </text>
+  
+  <!-- User Info -->
+  <text x="${width/2}" y="120" text-anchor="middle" fill="${colors.subText}" font-size="18" font-family="Arial, sans-serif">
+    @${result.username} • Starting Your Coding Adventure
+    <animate attributeName="opacity" values="0;1" dur="0.8s" begin="0.5s" fill="freeze"/>
+  </text>
+  
+  <!-- Motivational Card -->
+  <g transform="translate(${width/2 - 300}, 180)">
+    <rect width="600" height="200" fill="${colors.cardBackground}" stroke="${colors.cardBorder}" stroke-width="2" rx="15" filter="url(#shadow)">
+      <animate attributeName="opacity" values="0;1" dur="0.8s" begin="1s" fill="freeze"/>
+      <animateTransform attributeName="transform" type="scale" values="0.9;1" dur="0.8s" begin="1s" fill="freeze"/>
+    </rect>
+    
+    <!-- Large Motivational Icon -->
+    <text x="300" y="70" text-anchor="middle" fill="#fbbf24" font-size="48" font-family="Arial, sans-serif" filter="url(#glow)">
+      ★
+      <animate attributeName="opacity" values="0;1" dur="0.6s" begin="1.5s" fill="freeze"/>
+      <animateTransform attributeName="transform" type="scale" values="0;1.2;1" dur="1s" begin="1.5s" fill="freeze"/>
+      <animate attributeName="opacity" values="1;0.7;1" dur="2s" begin="2.5s" repeatCount="indefinite"/>
+    </text>
+    
+    <!-- Motivational Quote -->
+    <text x="300" y="130" text-anchor="middle" fill="${colors.headerText}" font-size="20" font-weight="bold" font-family="Arial, sans-serif">
+      <tspan x="300" dy="0">Keep Coding, Keep Growing!</tspan>
+      <animate attributeName="opacity" values="0;1" dur="0.6s" begin="2s" fill="freeze"/>
+    </text>
+    
+    <text x="300" y="165" text-anchor="middle" fill="${colors.valueText}" font-size="16" font-family="Arial, sans-serif">
+      <tspan x="300" dy="0">${randomQuote.replace(/[🌟🚀💪🎯✨🔥🌈⭐🎖️]/g, '').trim()}</tspan>
+      <animate attributeName="opacity" values="0;1" dur="0.6s" begin="2.5s" fill="freeze"/>
+    </text>
+  </g>
+  
+  <!-- Encouragement Cards -->
+  <g transform="translate(80, 420)">
+    <!-- Start Card -->
+    <rect width="200" height="100" fill="${colors.cardBackground}" stroke="${colors.cardBorder}" stroke-width="1" rx="8" filter="url(#shadow)">
+      <animate attributeName="opacity" values="0;1" dur="0.6s" begin="3s" fill="freeze"/>
+      <animateTransform attributeName="transform" type="translate" values="-50,0;0,0" dur="0.6s" begin="3s" fill="freeze"/>
+    </rect>
+    <text x="100" y="30" text-anchor="middle" fill="${colors.labelText}" font-size="14" font-weight="bold" font-family="Arial, sans-serif">GET STARTED
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="3.2s" fill="freeze"/>
+    </text>
+    <text x="100" y="55" text-anchor="middle" fill="${colors.valueText}" font-size="16" font-weight="bold" font-family="Arial, sans-serif">
+      Create &amp; Push
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="3.4s" fill="freeze"/>
+    </text>
+    <text x="100" y="75" text-anchor="middle" fill="${colors.labelText}" font-size="12" font-family="Arial, sans-serif">
+      Your first commit awaits!
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="3.6s" fill="freeze"/>
+    </text>
+  </g>
+  
+  <g transform="translate(300, 420)">
+    <!-- Build Card -->
+    <rect width="200" height="100" fill="${colors.cardBackground}" stroke="${colors.cardBorder}" stroke-width="1" rx="8" filter="url(#shadow)">
+      <animate attributeName="opacity" values="0;1" dur="0.6s" begin="3.3s" fill="freeze"/>
+      <animateTransform attributeName="transform" type="translate" values="0,50;0,0" dur="0.6s" begin="3.3s" fill="freeze"/>
+    </rect>
+    <text x="100" y="30" text-anchor="middle" fill="${colors.labelText}" font-size="14" font-weight="bold" font-family="Arial, sans-serif">BUILD
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="3.5s" fill="freeze"/>
+    </text>
+    <text x="100" y="55" text-anchor="middle" fill="${colors.valueText}" font-size="16" font-weight="bold" font-family="Arial, sans-serif">
+      Learn &amp; Grow
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="3.7s" fill="freeze"/>
+    </text>
+    <text x="100" y="75" text-anchor="middle" fill="${colors.labelText}" font-size="12" font-family="Arial, sans-serif">
+      Every line counts!
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="3.9s" fill="freeze"/>
+    </text>
+  </g>
+  
+  <g transform="translate(520, 420)">
+    <!-- Shine Card -->
+    <rect width="200" height="100" fill="${colors.cardBackground}" stroke="${colors.cardBorder}" stroke-width="1" rx="8" filter="url(#shadow)">
+      <animate attributeName="opacity" values="0;1" dur="0.6s" begin="3.6s" fill="freeze"/>
+      <animateTransform attributeName="transform" type="translate" values="50,0;0,0" dur="0.6s" begin="3.6s" fill="freeze"/>
+    </rect>
+    <text x="100" y="30" text-anchor="middle" fill="${colors.labelText}" font-size="14" font-weight="bold" font-family="Arial, sans-serif">SHINE
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="3.8s" fill="freeze"/>
+    </text>
+    <text x="100" y="55" text-anchor="middle" fill="${colors.valueText}" font-size="16" font-weight="bold" font-family="Arial, sans-serif">
+      Make Impact
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="4s" fill="freeze"/>
+    </text>
+    <text x="100" y="75" text-anchor="middle" fill="${colors.labelText}" font-size="12" font-family="Arial, sans-serif">
+      Your future is bright!
+      <animate attributeName="opacity" values="0;1" dur="0.5s" begin="4.2s" fill="freeze"/>
+    </text>
+  </g>
+  
+  <!-- Footer -->
+  <text x="${width/2}" y="570" text-anchor="middle" fill="${colors.footerText}" font-size="12" font-family="Arial, sans-serif">
+    Generated by GitHub User Rank Tracker • Your coding journey starts now! • ${new Date().toLocaleDateString()}
+    <animate attributeName="opacity" values="0;1" dur="0.5s" begin="5s" fill="freeze"/>
+  </text>
+</svg>`.trim();
 }
 
 async function main() {

@@ -136,7 +136,8 @@ export class UserProgressTracker {
     // Step 1: Find user's country
     const country = await this.findUserCountry(request.username);
     if (!country) {
-      throw new Error(`User @${request.username} not found in any country data`);
+      console.log(`🎯 User @${request.username} not found in ranking data - generating motivational report`);
+      return this.generateMotivationalReport(request.username, request.days);
     }
 
     console.log(`📍 Found @${request.username} in ${country}`);
@@ -167,6 +168,54 @@ export class UserProgressTracker {
     console.log(`✅ Analysis complete! User went ${summary.followersProgress.rankChange > 0 ? 'up' : 'down'} by ${Math.abs(summary.followersProgress.rankChange)} positions in followers ranking`);
 
     return summary;
+  }
+
+  /**
+   * Generate a motivational report for users not found in ranking data
+   */
+  private generateMotivationalReport(username: string, days: number): UserProgressSummary {
+    const motivationalQuotes = [
+      "🌟 Every expert was once a beginner. Keep pushing forward!",
+      "🚀 Your coding journey is just getting started. The best is yet to come!",
+      "💪 Great developers aren't born, they're made through persistence and practice.",
+      "🎯 Rome wasn't built in a day, neither are great GitHub profiles. Keep coding!",
+      "✨ Every commit is a step forward. Your dedication will pay off!",
+      "🔥 The only way to do great work is to love what you do. Keep growing!",
+      "🌈 Success is not final, failure is not fatal. Keep coding with courage!",
+      "⭐ Your potential is limitless. Keep pushing your boundaries!",
+      "🎖️ Champions are made in practice, not just in competition. Keep coding!",
+      "🌟 The journey of a thousand commits begins with a single push!"
+    ];
+
+    const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+    
+    console.log(`💬 ${randomQuote}`);
+
+    return {
+      username,
+      country: 'global',
+      daysAnalyzed: days,
+      commitsAnalyzed: 0,
+      followersProgress: {
+        startRank: undefined,
+        endRank: undefined,
+        rankChange: 0,
+        countChange: 0
+      },
+      publicContributionsProgress: {
+        startRank: undefined,
+        endRank: undefined,
+        rankChange: 0,
+        countChange: 0
+      },
+      totalContributionsProgress: {
+        startRank: undefined,
+        endRank: undefined,
+        rankChange: 0,
+        countChange: 0
+      },
+      snapshots: []
+    };
   }
 
   /**
